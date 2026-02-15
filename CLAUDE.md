@@ -32,31 +32,43 @@ specforge clarify <spec-id>
 ```
 Scans the spec for 10 categories of ambiguity. Fix findings before proceeding.
 
-### 4. Generate Plan
+### 4. Review Spec Quality
+```bash
+specforge review <spec-id>
+```
+Scores the spec on 5 dimensions (completeness, clarity, testability, feasibility, consistency) out of 100. Use `--strict` for stricter thresholds, `--ci --min-score 70` in CI.
+
+### 5. Generate Plan
 ```bash
 specforge plan <spec-id>
 ```
 Creates `plan.md` + `data-model.md` with implementation phases and file changes.
 
-### 5. Generate Tasks
+### 6. Brainstorm
+```bash
+specforge brainstorm <spec-id>
+```
+Researches competitors and suggests value-add features. Auto-selects which tools (npm, GitHub, screenshots) to trigger based on spec content. Use `--include`/`--exclude` to override.
+
+### 7. Generate Tasks
 ```bash
 specforge tasks <spec-id>
 ```
 Creates `tasks.md` with [T001]-style tasks, dependencies, and parallel markers.
 
-### 6. Analyze Consistency
+### 8. Analyze Consistency
 ```bash
 specforge analyze [spec-id]
 ```
 Cross-checks spec vs plan vs tasks vs .spec.yaml models.
 
-### 7. Generate Code
+### 9. Generate Code
 ```bash
 specforge validate
 specforge generate
 ```
 
-### 8. Check Diff
+### 10. Check Diff
 ```bash
 specforge diff -v
 ```
@@ -72,8 +84,10 @@ specforge diff -v
 ## Key Rules
 1. **Spec first, code second** — Always update the spec before writing code
 2. **Check the constitution** — Read `memory/constitution.md` before architectural decisions
-3. **Run the full pipeline** — specify > clarify > plan > tasks > analyze > generate
+3. **Run the full pipeline** — specify > clarify > review > plan > brainstorm > tasks > analyze > generate
 4. **Use analyze** — Run `specforge analyze` to catch inconsistencies
+5. **Use review** — Run `specforge review` to score spec quality before planning
+6. **Keep in sync** — Run `specforge update` after upgrading the CLI globally
 
 ## Project Structure
 ```
