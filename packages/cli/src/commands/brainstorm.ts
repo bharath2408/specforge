@@ -11,7 +11,12 @@ import {
   buildComparisonTable,
   generateBrainstormMarkdown,
 } from "@specforge-dev/core/brainstorm";
-import type { CompetitorInfo, BrainstormReport } from "@specforge-dev/core";
+import {
+  analyzeSpecSignals,
+  selectTools,
+  formatToolSelectionSummary,
+} from "@specforge-dev/core/tool-selector";
+import type { CompetitorInfo, BrainstormReport, ToolOverride } from "@specforge-dev/core";
 import { parseSpecDirName } from "@specforge-dev/core/sequence";
 import { searchNpm, searchGitHub, fetchCompetitorPage, buildCompetitorList } from "../research.js";
 
@@ -20,6 +25,8 @@ interface BrainstormOptions {
   urls?: string[];
   skipScreenshots?: boolean;
   npmKeywords?: string[];
+  include?: string[];
+  exclude?: string[];
 }
 
 export async function brainstormCommand(
@@ -82,7 +89,29 @@ export async function brainstormCommand(
   );
   spinner.succeed("  Loaded spec and plan");
 
-  // 2. Extract search keywords
+  // 2. Smart tool selection (FR-001, FR-002)
+  spinner.start("  Analyzing spec for tool selection...");
+  const signals = analyzeSpecSignals(spec, specContent);
+
+  // Build overrides from CLI flags (support both space and comma separation)
+  const overrides: ToolOverride = {};
+  if (options.include) overrides.include = options.include.flatMap((t) => t.split(","));
+  if (options.exclude) overrides.exclude = options.exclude.flatMap((t) => t.split(","));
+  // --offline is a shortcut for --exclude npm,github,screenshots
+  if (options.offline) {
+    overrides.exclude = [...(overrides.exclude ?? []), "npm", "github", "screenshots"];
+  }
+
+  const hasUrls = !!(options.urls && options.urls.length > 0);
+  const toolSelection = selectTools(signals, overrides, hasUrls);
+  spinner.succeed("  Tool selection complete");
+
+  // Print tool selection summary (FR-005)
+  console.log("");
+  console.log(formatToolSelectionSummary(specId, toolSelection));
+  console.log("");
+
+  // 3. Extract search keywords
   spinner.start("  Extracting search keywords...");
   const keywords = extractSearchKeywords(spec, plan);
   const allKeywords = options.npmKeywords
@@ -90,34 +119,38 @@ export async function brainstormCommand(
     : keywords;
   spinner.succeed(`  Extracted ${allKeywords.length} search keywords`);
 
-  // 3. Research competitors (online mode)
+  // 4. Research competitors (based on tool selection)
   let competitors: CompetitorInfo[] = [];
-  const isOnline = !options.offline;
+  const isOnline = toolSelection.npm || toolSelection.github || toolSelection.urls;
 
   if (isOnline) {
-    // Search npm
-    spinner.start("  Searching npm registry...");
+    // Search npm (only if selected)
     let npmResults: CompetitorInfo[] = [];
-    try {
-      npmResults = await searchNpm(allKeywords);
-      spinner.succeed(`  Found ${npmResults.length} npm packages`);
-    } catch {
-      spinner.warn("  npm search failed, continuing...");
+    if (toolSelection.npm) {
+      spinner.start("  Searching npm registry...");
+      try {
+        npmResults = await searchNpm(allKeywords);
+        spinner.succeed(`  Found ${npmResults.length} npm packages`);
+      } catch {
+        spinner.warn("  npm search failed, continuing...");
+      }
     }
 
-    // Search GitHub
-    spinner.start("  Searching GitHub repositories...");
+    // Search GitHub (only if selected)
     let githubResults: CompetitorInfo[] = [];
-    try {
-      githubResults = await searchGitHub(allKeywords);
-      spinner.succeed(`  Found ${githubResults.length} GitHub repositories`);
-    } catch {
-      spinner.warn("  GitHub search failed, continuing...");
+    if (toolSelection.github) {
+      spinner.start("  Searching GitHub repositories...");
+      try {
+        githubResults = await searchGitHub(allKeywords);
+        spinner.succeed(`  Found ${githubResults.length} GitHub repositories`);
+      } catch {
+        spinner.warn("  GitHub search failed, continuing...");
+      }
     }
 
-    // Fetch user-provided URLs
+    // Fetch user-provided URLs (only if selected)
     const urlResults: CompetitorInfo[] = [];
-    if (options.urls && options.urls.length > 0) {
+    if (toolSelection.urls && options.urls && options.urls.length > 0) {
       spinner.start(`  Fetching ${options.urls.length} competitor URL(s)...`);
       for (const url of options.urls) {
         const result = await fetchCompetitorPage(url);
@@ -138,9 +171,9 @@ export async function brainstormCommand(
     console.log("  Running in offline mode — skipping web research.\n");
   }
 
-  // 4. Screenshots (if online and not skipped)
+  // 5. Screenshots (only if selected)
   let screenshotsDir: string | undefined;
-  if (isOnline && !options.skipScreenshots && competitors.some((c) => c.url)) {
+  if (toolSelection.screenshots && competitors.some((c) => c.url)) {
     const screenshotDirPath = path.join(specDir, "brainstorm-screenshots");
     spinner.start("  Capturing competitor screenshots...");
 
@@ -176,20 +209,20 @@ export async function brainstormCommand(
     }
   }
 
-  // 5. Analyze feature gaps
+  // 6. Analyze feature gaps (heuristics always run)
   spinner.start("  Analyzing feature gaps...");
   const gaps = analyzeFeaturesForGaps(spec, plan, competitors);
   spinner.succeed(`  Found ${gaps.length} feature gap(s)`);
 
-  // 6. Generate suggestions
+  // 7. Generate suggestions
   spinner.start("  Generating value-add suggestions...");
   const suggestions = generateBrainstormSuggestions(spec, plan, gaps);
   spinner.succeed(`  Generated ${suggestions.length} suggestion(s)`);
 
-  // 7. Build comparison table
+  // 8. Build comparison table
   const comparisonTable = buildComparisonTable(spec, competitors, gaps);
 
-  // 8. Build report
+  // 9. Build report
   const report: BrainstormReport = {
     specId: spec.id,
     generatedAt: new Date().toISOString().split("T")[0],
@@ -201,14 +234,14 @@ export async function brainstormCommand(
     screenshotsDir,
   };
 
-  // 9. Write report
+  // 10. Write report
   spinner.start("  Writing brainstorm report...");
   const reportMarkdown = generateBrainstormMarkdown(report);
   const reportPath = path.join(specDir, "brainstorm-report.md");
   fs.writeFileSync(reportPath, reportMarkdown, "utf-8");
   spinner.succeed(`  Report written: ${reportPath}`);
 
-  // 10. Print summary
+  // 11. Print summary
   const p1 = suggestions.filter((s) => s.priority === "P1").length;
   const p2 = suggestions.filter((s) => s.priority === "P2").length;
   const p3 = suggestions.filter((s) => s.priority === "P3").length;

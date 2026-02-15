@@ -56,6 +56,10 @@
     "./reviewer": {
       "types": "./dist/reviewer.d.ts",
       "default": "./dist/reviewer.js"
+    },
+    "./tool-selector": {
+      "types": "./dist/tool-selector.d.ts",
+      "default": "./dist/tool-selector.js"
     }
   },
   "scripts": {

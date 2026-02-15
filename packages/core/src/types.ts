@@ -387,6 +387,38 @@ export interface ReviewOptions {
 }
 
 // ──────────────────────────────────────────────────────────────
+// Smart Brainstorm Tool Selection
+// ──────────────────────────────────────────────────────────────
+
+export type DomainCategory = "ui" | "api" | "infrastructure" | "library" | "cli" | "mixed";
+
+export interface SpecSignals {
+  domainCategory: DomainCategory;
+  externalDependencyLikelihood: "high" | "medium" | "low";
+  hasVisualComponent: boolean;
+  detectedKeywords: {
+    npm: string[];
+    ui: string[];
+    infrastructure: string[];
+    protocol: string[];
+  };
+}
+
+export interface ToolSelection {
+  npm: boolean;
+  github: boolean;
+  urls: boolean;
+  screenshots: boolean;
+  heuristics: true;
+  reasons: Record<string, string>;
+}
+
+export interface ToolOverride {
+  include?: string[];
+  exclude?: string[];
+}
+
+// ──────────────────────────────────────────────────────────────
 // Update
 // ──────────────────────────────────────────────────────────────
 

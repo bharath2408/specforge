@@ -130,12 +130,16 @@ program
   .option("--urls <urls...>", "Competitor URLs to analyze")
   .option("--skip-screenshots", "Skip taking screenshots")
   .option("--npm-keywords <keywords...>", "Additional npm search keywords")
+  .option("--include <tools...>", "Force-enable tools: npm, github, screenshots, all")
+  .option("--exclude <tools...>", "Force-disable tools: npm, github, screenshots")
   .action(async (specId: string, opts) => {
     await brainstormCommand(specId, {
       offline: opts.offline,
       urls: opts.urls,
       skipScreenshots: opts.skipScreenshots,
       npmKeywords: opts.npmKeywords,
+      include: opts.include,
+      exclude: opts.exclude,
     });
   });
 

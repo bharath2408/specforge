@@ -65,6 +65,13 @@ export {
   generateBrainstormMarkdown,
 } from "./brainstorm.js";
 
+// Phase 4b: Smart Tool Selection
+export {
+  analyzeSpecSignals,
+  selectTools,
+  formatToolSelectionSummary,
+} from "./tool-selector.js";
+
 // Phase 6: Review
 export { reviewSpec, generateReviewMarkdown } from "./reviewer.js";
 
@@ -133,6 +140,10 @@ export type {
   CustomCommandsFile,
   FileChangeEntry,
   UpdateResult,
+  DomainCategory,
+  SpecSignals,
+  ToolSelection,
+  ToolOverride,
   ReviewDimension,
   ReviewFinding,
   DimensionScore,
