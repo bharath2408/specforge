@@ -1,6 +1,6 @@
 {
   "name": "@specforge/cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "CLI interface for SpecForge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

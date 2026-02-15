@@ -1,6 +1,6 @@
 {
   "name": "@specforge/generator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Code generation engine for SpecForge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
