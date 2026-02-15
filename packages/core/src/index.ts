@@ -56,6 +56,15 @@ export {
   generateAnalysisMarkdown,
 } from "./analyzer.js";
 
+// Phase 4: Brainstorm
+export {
+  extractSearchKeywords,
+  analyzeFeaturesForGaps,
+  generateBrainstormSuggestions,
+  buildComparisonTable,
+  generateBrainstormMarkdown,
+} from "./brainstorm.js";
+
 // Types
 export type {
   FieldType,
@@ -97,4 +106,9 @@ export type {
   GitContext,
   AmbiguityFinding,
   CoverageTable,
+  CompetitorInfo,
+  FeatureGap,
+  ValueAddSuggestion,
+  BrainstormReport,
+  CompetitorComparisonRow,
 } from "./types.js";

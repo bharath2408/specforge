@@ -44,6 +44,10 @@
     "./analyzer": {
       "types": "./dist/analyzer.d.ts",
       "default": "./dist/analyzer.js"
+    },
+    "./brainstorm": {
+      "types": "./dist/brainstorm.d.ts",
+      "default": "./dist/brainstorm.js"
     }
   },
   "scripts": {

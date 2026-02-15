@@ -16,6 +16,7 @@ import { watchCommand } from "./commands/watch.js";
 import { issuesCommand } from "./commands/issues.js";
 import { removeCommand } from "./commands/remove.js";
 import { implementCommand } from "./commands/implement.js";
+import { brainstormCommand } from "./commands/brainstorm.js";
 
 const program = new Command();
 
@@ -109,6 +110,22 @@ program
   .description("Generate an implementation plan from a feature spec")
   .action(async (specId: string) => {
     await planCommand(specId);
+  });
+
+program
+  .command("brainstorm <spec-id>")
+  .description("Analyze spec and plan, research competitors, and generate value-add suggestions")
+  .option("--offline", "Skip web research and screenshots")
+  .option("--urls <urls...>", "Competitor URLs to analyze")
+  .option("--skip-screenshots", "Skip taking screenshots")
+  .option("--npm-keywords <keywords...>", "Additional npm search keywords")
+  .action(async (specId: string, opts) => {
+    await brainstormCommand(specId, {
+      offline: opts.offline,
+      urls: opts.urls,
+      skipScreenshots: opts.skipScreenshots,
+      npmKeywords: opts.npmKeywords,
+    });
   });
 
 program

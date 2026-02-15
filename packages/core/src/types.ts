@@ -278,3 +278,50 @@ export interface CoverageTable {
   status: "covered" | "partial" | "missing";
   details: string;
 }
+
+// ──────────────────────────────────────────────────────────────
+// Brainstorm
+// ──────────────────────────────────────────────────────────────
+
+export interface CompetitorInfo {
+  name: string;
+  url?: string;
+  source: "npm" | "github" | "url";
+  description: string;
+  features: string[];
+  screenshotPath?: string;
+}
+
+export interface FeatureGap {
+  feature: string;
+  competitors: string[];
+  relevance: "high" | "medium" | "low";
+  recommendation: string;
+}
+
+export interface ValueAddSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  rationale: string;
+  priority: Priority;
+  relatedRequirements: string[];
+  relatedScenarios: string[];
+}
+
+export interface BrainstormReport {
+  specId: string;
+  generatedAt: string;
+  mode: "online" | "offline";
+  competitors: CompetitorInfo[];
+  featureGaps: FeatureGap[];
+  suggestions: ValueAddSuggestion[];
+  comparisonTable: CompetitorComparisonRow[];
+  screenshotsDir?: string;
+}
+
+export interface CompetitorComparisonRow {
+  feature: string;
+  currentSpec: "planned" | "partial" | "missing";
+  competitors: Record<string, "yes" | "no" | "partial" | "unknown">;
+}
