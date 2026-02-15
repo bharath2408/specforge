@@ -1,0 +1,37 @@
+# Data Model
+
+> Generated: {{date}}
+
+{{#if entities.length}}
+## ER Diagram
+
+```mermaid
+erDiagram
+{{#each entities}}
+    {{this.name}} {
+{{#each this.fields}}
+        {{this.type}} {{this.name}}
+{{/each}}
+    }
+{{/each}}
+```
+
+## Entities
+
+{{#each entities}}
+### {{this.name}}
+
+| Field | Type | Constraints |
+|-------|------|-------------|
+{{#each this.fields}}
+| {{this.name}} | {{this.type}} | {{this.constraints}} |
+{{/each}}
+
+{{#if this.relationships.length}}
+**Relationships:** {{#each this.relationships}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+
+{{/each}}
+{{else}}
+_No entities defined in the spec._
+{{/if}}

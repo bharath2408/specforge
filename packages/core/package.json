@@ -1,0 +1,65 @@
+{
+  "name": "@specforge/core",
+  "version": "0.1.0",
+  "description": "Spec parser, validator, and schema engine for SpecForge",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
+    },
+    "./sequence": {
+      "types": "./dist/sequence.d.ts",
+      "default": "./dist/sequence.js"
+    },
+    "./git": {
+      "types": "./dist/git.d.ts",
+      "default": "./dist/git.js"
+    },
+    "./constitution": {
+      "types": "./dist/constitution.d.ts",
+      "default": "./dist/constitution.js"
+    },
+    "./specfile": {
+      "types": "./dist/specfile.d.ts",
+      "default": "./dist/specfile.js"
+    },
+    "./ambiguity": {
+      "types": "./dist/ambiguity.d.ts",
+      "default": "./dist/ambiguity.js"
+    },
+    "./planner": {
+      "types": "./dist/planner.d.ts",
+      "default": "./dist/planner.js"
+    },
+    "./tasks": {
+      "types": "./dist/tasks.d.ts",
+      "default": "./dist/tasks.js"
+    },
+    "./analyzer": {
+      "types": "./dist/analyzer.d.ts",
+      "default": "./dist/analyzer.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "yaml": "^2.7.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["specforge", "spec", "parser", "validator"],
+  "author": "d2railabs",
+  "license": "MIT"
+}

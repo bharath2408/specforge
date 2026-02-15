@@ -1,0 +1,19 @@
+{
+  "name": "specforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Spec-Driven Development Kit by d2railabs",
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  },
+  "keywords": ["spec-driven", "code-generation", "sdlc", "toolkit"],
+  "author": "d2railabs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

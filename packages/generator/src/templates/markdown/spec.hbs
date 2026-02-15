@@ -1,0 +1,54 @@
+# Feature Spec: {{name}}
+
+> Spec ID: {{id}}
+> Created: {{date}}
+
+## Status
+
+Status: {{status}}
+
+## User Scenarios
+
+{{#each scenarios}}
+### [{{this.id}}] [{{this.priority}}] {{this.description}}
+
+**Given** {{this.given}}
+**When** {{this.when}}
+**Then** {{this.then}}
+
+{{/each}}
+
+## Functional Requirements
+
+{{#each requirements}}
+### [{{this.id}}] {{this.description}}
+
+{{#if this.scenarios.length}}
+Scenarios: {{#each this.scenarios}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+
+{{/each}}
+
+## Key Entities
+
+{{#each entities}}
+- **{{this}}** — Description needed
+{{/each}}
+
+## Success Criteria
+
+{{#each successCriteria}}
+- {{this}}
+{{/each}}
+
+## Edge Cases
+
+{{#each edgeCases}}
+- {{this}}
+{{/each}}
+
+## Open Questions
+
+{{#each openQuestions}}
+- {{this}}
+{{/each}}

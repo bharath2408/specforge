@@ -1,0 +1,27 @@
+# Project Constitution
+
+> This document defines the core principles governing this project.
+> Amendments are tracked at the bottom.
+
+## Articles
+
+{{#each articles}}
+### [{{this.id}}] {{this.title}}
+
+{{this.description}}
+
+{{/each}}
+
+## Amendments
+
+{{#if amendments.length}}
+{{#each amendments}}
+### [{{this.id}}] ({{this.date}}) {{this.description}}
+{{#if this.articleId}}
+Affects: [{{this.articleId}}]
+{{/if}}
+
+{{/each}}
+{{else}}
+_No amendments yet._
+{{/if}}

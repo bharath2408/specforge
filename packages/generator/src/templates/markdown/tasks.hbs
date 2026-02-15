@@ -1,0 +1,17 @@
+# Tasks: {{specId}}
+
+> Generated: {{date}}
+
+Progress: {{completedTasks}}/{{totalTasks}} tasks complete
+
+{{#each phases}}
+## {{this.name}}
+
+{{#each this.tasks}}
+- [{{#if this.done}}x{{else}} {{/if}}] [{{this.id}}] [{{this.priority}}] [{{this.scenarioRef}}] {{this.description}}{{#if this.parallel}} ⚡{{/if}}{{#if this.dependencies.length}} deps: [{{#each this.dependencies}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}]{{/if}}
+{{/each}}
+
+{{/each}}
+
+---
+Legend: ⚡ = can run in parallel | deps: [T001] = depends on T001

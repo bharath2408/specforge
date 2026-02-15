@@ -1,0 +1,29 @@
+{
+  "name": "@specforge/cli",
+  "version": "0.1.0",
+  "description": "CLI interface for SpecForge",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "specforge": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@specforge/core": "workspace:*",
+    "@specforge/generator": "workspace:*",
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["specforge", "cli"],
+  "author": "d2railabs",
+  "license": "MIT"
+}

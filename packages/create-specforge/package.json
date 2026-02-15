@@ -1,0 +1,25 @@
+{
+  "name": "create-specforge",
+  "version": "0.1.0",
+  "description": "Scaffold a new SpecForge project",
+  "main": "dist/index.js",
+  "bin": {
+    "create-specforge": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["specforge", "scaffolder", "create"],
+  "author": "d2railabs",
+  "license": "MIT"
+}

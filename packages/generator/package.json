@@ -1,0 +1,23 @@
+{
+  "name": "@specforge/generator",
+  "version": "0.1.0",
+  "description": "Code generation engine for SpecForge",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && node scripts/copy-templates.js",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@specforge/core": "workspace:*",
+    "handlebars": "^4.7.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["specforge", "generator", "code-generation"],
+  "author": "d2railabs",
+  "license": "MIT"
+}

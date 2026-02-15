@@ -1,0 +1,30 @@
+# Implementation Plan: {{specId}}
+
+> Generated: {{date}}
+
+## Constitutional Compliance
+
+{{#each constitutionCompliance}}
+- {{this}}
+{{/each}}
+
+## Technical Context
+
+{{#each techContext}}
+- {{this}}
+{{/each}}
+
+## Implementation Phases
+
+{{#each phases}}
+### {{this.name}}
+
+{{this.description}}
+
+| File | Action | Description |
+|------|--------|-------------|
+{{#each this.fileChanges}}
+| `{{this.path}}` | {{this.action}} | {{this.description}} |
+{{/each}}
+
+{{/each}}
