@@ -48,6 +48,10 @@
     "./brainstorm": {
       "types": "./dist/brainstorm.d.ts",
       "default": "./dist/brainstorm.js"
+    },
+    "./custom-commands": {
+      "types": "./dist/custom-commands.d.ts",
+      "default": "./dist/custom-commands.js"
     }
   },
   "scripts": {

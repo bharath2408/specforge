@@ -33,7 +33,7 @@ const program = new Command();
 program
   .name("specforge")
   .description("SpecForge — Spec-Driven Development Kit")
-  .version("0.1.0");
+  .version("1.0.4");
 
 program
   .command("init [project-name]")
