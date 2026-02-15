@@ -20,6 +20,7 @@ import { brainstormCommand } from "./commands/brainstorm.js";
 import { updateCommand } from "./commands/update.js";
 import { reviewCommand } from "./commands/review.js";
 import { testE2eCommand } from "./commands/test-e2e.js";
+import { testPwCommand } from "./commands/test-pw.js";
 import {
   commandAddHandler,
   commandListHandler,
@@ -35,7 +36,7 @@ const program = new Command();
 program
   .name("specforge")
   .description("SpecForge — Spec-Driven Development Kit")
-  .version("1.0.4");
+  .version("1.0.5");
 
 program
   .command("init [project-name]")
@@ -185,6 +186,22 @@ program
       command: opts.command,
       suite: opts.suite,
       workers: opts.workers,
+    });
+  });
+
+program
+  .command("test-pw [spec-id]")
+  .description("Generate Playwright MCP E2E tests from feature specs and .spec.yaml")
+  .option("--run", "Run all generated Playwright tests")
+  .option("--headed", "Run in headed browser mode (with --run)")
+  .option("--api-only", "Only generate API tests (skip UI/page objects)")
+  .option("--base-url <url>", "Application base URL (default: http://localhost:3000)")
+  .action(async (specId: string | undefined, opts) => {
+    await testPwCommand(specId, {
+      run: opts.run,
+      headed: opts.headed,
+      apiOnly: opts.apiOnly,
+      baseUrl: opts.baseUrl,
     });
   });
 

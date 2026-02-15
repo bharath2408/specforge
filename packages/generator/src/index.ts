@@ -5,6 +5,7 @@ import { fastifyPlugin } from "./plugins/fastify.js";
 import { testPlugin } from "./plugins/test.js";
 import { docsPlugin } from "./plugins/docs.js";
 import { middlewarePlugin } from "./plugins/middleware.js";
+import { playwrightPlugin } from "./plugins/playwright.js";
 import type { SpecForgePlugin } from "./types.js";
 
 export { renderTemplate, loadTemplate } from "./engine.js";
@@ -14,6 +15,7 @@ export { fastifyPlugin } from "./plugins/fastify.js";
 export { testPlugin } from "./plugins/test.js";
 export { docsPlugin } from "./plugins/docs.js";
 export { middlewarePlugin } from "./plugins/middleware.js";
+export { playwrightPlugin } from "./plugins/playwright.js";
 export type { SpecForgePlugin, TemplateContext } from "./types.js";
 
 const builtinPlugins: Record<string, SpecForgePlugin> = {
@@ -23,6 +25,7 @@ const builtinPlugins: Record<string, SpecForgePlugin> = {
   test: testPlugin,
   docs: docsPlugin,
   middleware: middlewarePlugin,
+  playwright: playwrightPlugin,
 };
 
 export interface GenerateResult {

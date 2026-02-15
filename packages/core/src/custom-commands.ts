@@ -30,6 +30,7 @@ const BUILT_IN_COMMANDS = new Set([
   "command",
   "update",
   "review",
+  "test-pw",
 ]);
 
 const VARIABLE_NAME_RE = /^[a-zA-Z][a-zA-Z0-9_-]*$/;

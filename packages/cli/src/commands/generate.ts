@@ -82,4 +82,8 @@ export async function generateCommand(
   }
 
   console.log(`\nDone!\n`);
+  console.log(`  Next steps:`);
+  console.log(`    specforge diff -v                    # Preview changes`);
+  console.log(`    specforge test-pw <spec-id>          # Generate Playwright E2E tests for your app`);
+  console.log(``);
 }

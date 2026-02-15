@@ -221,7 +221,13 @@ specforge generate
 specforge diff -v
 \`\`\`
 
-### 11. Run E2E Tests
+### 11. Generate App E2E Tests
+\`\`\`bash
+specforge test-pw <spec-id>
+\`\`\`
+Generates Playwright MCP E2E tests for your application from feature spec scenarios and .spec.yaml endpoints. Use \`--run\` to execute, \`--api-only\` for API tests only.
+
+### 12. Run SpecForge E2E Tests
 \`\`\`bash
 specforge test-e2e
 \`\`\`
@@ -234,11 +240,12 @@ Runs Playwright E2E tests against all CLI commands. Use \`--command <name>\` to 
 - \`test\` — Vitest test stubs
 - \`docs\` — OpenAPI + ER diagram + API docs
 - \`middleware\` — Auth + validation + error handler
+- \`playwright\` — Playwright MCP E2E tests
 
 ## Key Rules
 1. **Spec first, code second** — Always update the spec before writing code
 2. **Check the constitution** — Read \`memory/constitution.md\` before architectural decisions
-3. **Run the full pipeline** — specify > clarify > review > plan > brainstorm > tasks > analyze > generate > test-e2e
+3. **Run the full pipeline** — specify > clarify > review > plan > brainstorm > tasks > analyze > generate > test-pw > test-e2e
 4. **Use analyze** — Run \`specforge analyze\` to catch inconsistencies
 5. **Use review** — Run \`specforge review\` to score spec quality before planning
 6. **Run E2E tests** — Run \`specforge test-e2e\` to verify all commands work correctly
@@ -328,9 +335,9 @@ If $ARGUMENTS is provided, use it as plugin filter (e.g., "docs", "middleware").
 
 Run: \`specforge generate\` or \`specforge generate -p <plugins>\`
 
-Available plugins: model, prisma, fastify, test, docs, middleware.
+Available plugins: model, prisma, fastify, test, docs, middleware, playwright.
 
-Show the user what was generated and suggest reviewing the output.`,
+Show the user what was generated. Then suggest the next step: \`specforge test-pw <spec-id>\` to generate Playwright E2E tests for the application.`,
 
   "specforge-diff": `Show what \`specforge generate\` would change compared to files on disk.
 
@@ -359,24 +366,27 @@ It then shows a full implementation summary with task execution order, file chan
 
 Use \`--skip-generate\` to skip code generation. Use \`-p docs middleware\` to select specific plugins.`,
 
-  "specforge-pipeline": `Run the full SpecForge spec-driven development pipeline for a new feature.
+  "specforge-pipeline": `Run the SpecForge spec-driven development pipeline one step at a time.
 
 Ask the user for a feature name if not provided as $ARGUMENTS.
 
-Execute these steps in order:
-1. Check if SpecForge is initialized (\`spec/\` exists). If not, run \`specforge init .\`
-2. Check if constitution exists (\`memory/constitution.md\`). If not, run \`specforge constitution\`
-3. Run \`specforge specify <feature-name>\`
-4. Help the user fill in spec.md with real details
-5. Run \`specforge clarify <spec-id>\` and fix ambiguities
-6. Run \`specforge plan <spec-id>\`
-7. Run \`specforge tasks <spec-id>\`
-8. Run \`specforge analyze <spec-id>\`
-9. Update \`spec/app.spec.yaml\` if needed
-10. Run \`specforge validate\` then \`specforge generate\`
-11. Start implementing code following the plan and tasks
+Run ONE step at a time. After each step completes, show the result and suggest the next step — do NOT run the next step automatically. Wait for the user to confirm before proceeding.
 
-This is the complete Constitution > Specify > Clarify > Plan > Tasks > Analyze > Implement workflow.`,
+Pipeline steps:
+1. Check if SpecForge is initialized (\`spec/\` exists). If not, suggest: \`specforge init .\`
+2. Check if constitution exists (\`memory/constitution.md\`). If not, suggest: \`specforge constitution\`
+3. Suggest: \`specforge specify <feature-name>\`
+4. Help the user fill in spec.md with real details
+5. Suggest: \`specforge clarify <spec-id>\`
+6. Suggest: \`specforge review <spec-id>\`
+7. Suggest: \`specforge plan <spec-id>\`
+8. Suggest: \`specforge brainstorm <spec-id>\`
+9. Suggest: \`specforge tasks <spec-id>\`
+10. Suggest: \`specforge analyze <spec-id>\`
+11. Suggest: \`specforge generate\`
+12. Suggest: \`specforge test-pw <spec-id>\`
+
+After each step, tell the user what was produced and ask if they want to continue to the next step.`,
 
   "specforge-brainstorm": `Analyze a feature spec, research competitors, and generate value-add suggestions.
 
@@ -423,6 +433,34 @@ Options:
 This updates CLAUDE.md and slash commands in \`.claude/commands/\` to match the currently installed SpecForge CLI version. Run this after upgrading SpecForge globally.
 
 If the user wants to preview first, suggest \`specforge update --dry-run\`.`,
+
+  "specforge-test-pw": `Generate Playwright MCP E2E tests for your application.
+
+If $ARGUMENTS is provided, use it as the spec-id. Otherwise, list available specs and ask which one.
+
+Run: \`specforge test-pw <spec-id>\`
+
+This generates Playwright E2E tests for the application being developed using SpecForge — NOT tests for SpecForge itself. Tests are derived from:
+- Feature spec user scenarios (Given/When/Then) → scenario test files
+- .spec.yaml API endpoints → API test files with request/response validation
+- .spec.yaml models → test data factories
+- Auth configuration → authentication setup helpers
+
+Options:
+- \`--run\` — Run all generated Playwright tests
+- \`--headed\` — Run in headed browser mode (with --run)
+- \`--api-only\` — Only generate API tests (skip UI/page objects)
+- \`--base-url <url>\` — Application base URL (default: http://localhost:3000)
+
+Generated files:
+- \`tests/e2e/<spec-slug>.spec.ts\` — Scenario tests
+- \`tests/e2e/api/<model>.spec.ts\` — API endpoint tests
+- \`tests/e2e/fixtures/<model>-factory.ts\` — Test data factories
+- \`tests/e2e/pages/<entity>.ts\` — Page objects for UI entities
+- \`tests/e2e/auth-setup.ts\` — Authentication helpers
+- \`playwright.config.ts\` — Playwright configuration
+
+After generation, suggest the next step: \`specforge test-pw --run\` to execute the tests, or \`specforge test-e2e\` to run CLI E2E tests.`,
 
   "specforge-review": `Score a feature spec on 5 quality dimensions.
 

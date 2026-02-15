@@ -11,9 +11,9 @@ SpecForge is a complete spec-driven development toolkit that takes you from idea
 SpecForge follows a phased workflow. Each phase produces a markdown artifact that feeds into the next:
 
 ```
-init → constitution → specify → clarify → review → plan → brainstorm → tasks → analyze → generate → test-e2e
-                                                                                                        │
-                                                                                       issues ← implement
+init → constitution → specify → clarify → review → plan → brainstorm → tasks → analyze → generate → test-pw → test-e2e
+                                                                                                                          │
+                                                                                                         issues ← implement
 ```
 
 | Phase | Command | Input | Output | Purpose |
@@ -28,7 +28,8 @@ init → constitution → specify → clarify → review → plan → brainstorm
 | **Tasks** | `tasks` | `spec.md` | `tasks.md` | Generate prioritized, dependency-ordered task list |
 | **Analyze** | `analyze` | All artifacts | `analysis-report.md` | Cross-artifact consistency check |
 | **Generate** | `generate` | `.spec.yaml` | Source code | Generate models, routes, tests, schemas |
-| **Test** | `test-e2e` | All commands | HTML report | Playwright E2E tests for all CLI commands |
+| **App Tests** | `test-pw` | `spec.md`, `.spec.yaml` | Playwright tests | Generate Playwright MCP E2E tests for your app |
+| **CLI Tests** | `test-e2e` | All commands | HTML report | Playwright E2E tests for all CLI commands |
 | **Implement** | `implement` | `spec.md` | All of the above | Run the full pipeline end-to-end |
 
 ## Quick Start
@@ -265,6 +266,38 @@ Run generated test suites.
 specforge test
 ```
 
+#### `specforge test-pw [spec-id] [options]`
+
+Generate Playwright MCP E2E tests for your application from feature specs and `.spec.yaml` endpoints.
+
+```bash
+specforge test-pw 001-user-auth           # Generate tests from a feature spec
+specforge test-pw --api-only              # Only generate API tests
+specforge test-pw --run                   # Run all generated tests
+specforge test-pw --run --headed          # Run in headed browser mode
+specforge test-pw --base-url http://localhost:4000
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--run` | Run all generated Playwright tests |
+| `--headed` | Run in headed browser mode (with --run) |
+| `--api-only` | Only generate API tests (skip UI/page objects) |
+| `--base-url <url>` | Application base URL (default: `http://localhost:3000`) |
+
+**What it generates:**
+
+- `tests/e2e/<spec-slug>.spec.ts` — Scenario tests from Given/When/Then
+- `tests/e2e/api/<model>.spec.ts` — API endpoint tests with request/response validation
+- `tests/e2e/fixtures/<model>-factory.ts` — Test data factories for each model
+- `tests/e2e/pages/<entity>.ts` — Page objects for UI entities
+- `tests/e2e/auth-setup.ts` — Authentication helpers (when spec has auth strategy)
+- `playwright.config.ts` — Playwright configuration
+
+Also available as a generator plugin: `specforge generate -p playwright`
+
 #### `specforge test-e2e [options]`
 
 Run Playwright E2E tests against all SpecForge CLI commands.
@@ -365,6 +398,7 @@ specforge remove --force     # Remove without confirmation
 | **test** | `tests/*.test.ts` | Vitest test suites |
 | **docs** | `docs/` | OpenAPI 3.0 spec, Mermaid ER diagrams, API README |
 | **middleware** | `src/middleware/*.ts` | JWT auth, request validation, error handler |
+| **playwright** | `tests/e2e/` | Playwright MCP E2E tests, data factories, auth setup |
 
 ## Spec File Format
 
@@ -488,7 +522,7 @@ SpecForge is built as a pnpm monorepo with 4 packages:
 ```
 packages/
 ├── core/              — Types, parsing, validation, planning, brainstorm analysis
-├── cli/               — Commander.js CLI with 18 commands
+├── cli/               — Commander.js CLI with 19 commands
 ├── generator/         — Handlebars-based code generation with 6 plugins
 └── create-specforge/  — Project scaffolding (npx create-specforge)
 ```
