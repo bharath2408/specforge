@@ -356,6 +356,48 @@ Execute these steps in order:
 11. Start implementing code following the plan and tasks
 
 This is the complete Constitution > Specify > Clarify > Plan > Tasks > Analyze > Implement workflow.`,
+
+  "specforge-brainstorm": `Analyze a feature spec, research competitors, and generate value-add suggestions.
+
+If $ARGUMENTS is provided, use it as the spec-id. Otherwise, list available specs and ask which one.
+
+Run: \`specforge brainstorm <spec-id>\`
+
+Options:
+- \`--offline\` — Skip web research, use heuristic analysis only
+- \`--urls <urls...>\` — Competitor URLs to analyze
+- \`--skip-screenshots\` — Skip taking screenshots
+- \`--npm-keywords <keywords...>\` — Additional npm search keywords
+
+This searches npm/GitHub for competitors, analyzes feature gaps, checks for 16 commonly missing patterns (pagination, caching, rate limiting, RBAC, i18n, audit logging, webhooks, etc.), and produces prioritized suggestions.
+
+After generation, review the brainstorm report with the user and help incorporate high-priority suggestions into the spec.`,
+
+  "specforge-command": `Manage custom command shortcuts.
+
+Available subcommands:
+- \`specforge command add <name> --run <command>\` — Register a new custom command
+- \`specforge command list\` — List all custom commands
+- \`specforge command edit <name> --run <command>\` — Update an existing command
+- \`specforge command remove <name>\` — Remove a custom command
+- \`specforge command show <name>\` — Show details of a command
+
+Custom commands support variables: \`specforge command add deploy --run "git push {remote} {branch}"\`
+Variables are substituted from positional args or --name flags when the command is run.
+
+Help the user manage their custom commands based on what they want to do.`,
+
+  "specforge-update": `Sync project integration files with the installed CLI version.
+
+Run: \`specforge update\`
+
+Options:
+- \`--dry-run\` — Preview changes without writing files
+- \`--force\` — Force re-sync even if versions match
+
+This updates CLAUDE.md and slash commands in \`.claude/commands/\` to match the currently installed SpecForge CLI version. Run this after upgrading SpecForge globally.
+
+If the user wants to preview first, suggest \`specforge update --dry-run\`.`,
 };
 
 /**
