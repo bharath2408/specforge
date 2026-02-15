@@ -1,5 +1,5 @@
 {
-  "name": "@specforge/core",
+  "name": "@specforge-dev/core",
   "version": "1.0.3",
   "description": "Spec parser, validator, and schema engine for SpecForge",
   "main": "dist/index.js",

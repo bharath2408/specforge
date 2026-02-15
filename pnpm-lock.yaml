@@ -10,10 +10,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@specforge/core':
+      '@specforge-dev/core':
         specifier: workspace:*
         version: link:../core
-      '@specforge/generator':
+      '@specforge-dev/generator':
         specifier: workspace:*
         version: link:../generator
       chalk:
@@ -67,7 +67,7 @@ importers:
 
   packages/generator:
     dependencies:
-      '@specforge/core':
+      '@specforge-dev/core':
         specifier: workspace:*
         version: link:../core
       handlebars:

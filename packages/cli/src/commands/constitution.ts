@@ -5,9 +5,9 @@ import {
   generateConstitutionMarkdown,
   addAmendment,
   parseConstitution,
-} from "@specforge/core/constitution";
-import { loadConfig } from "@specforge/core/config";
-import type { Constitution } from "@specforge/core";
+} from "@specforge-dev/core/constitution";
+import { loadConfig } from "@specforge-dev/core/config";
+import type { Constitution } from "@specforge-dev/core";
 
 export interface ConstitutionCommandOptions {
   amend?: string;

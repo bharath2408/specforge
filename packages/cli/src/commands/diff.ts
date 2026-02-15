@@ -4,8 +4,8 @@ import {
   parseSpecFile,
   discoverSpecFiles,
   validateSpecOrThrow,
-} from "@specforge/core";
-import { generate, getBuiltinPlugins } from "@specforge/generator";
+} from "@specforge-dev/core";
+import { generate, getBuiltinPlugins } from "@specforge-dev/generator";
 import { findSpecDir } from "../utils.js";
 import { computeFileDiff } from "../diff-utils.js";
 import type { FileDiff } from "../diff-utils.js";

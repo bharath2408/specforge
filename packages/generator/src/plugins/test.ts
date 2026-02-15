@@ -1,4 +1,4 @@
-import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge/core";
+import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge-dev/core";
 import { renderTemplate } from "../engine.js";
 import type { SpecForgePlugin } from "../types.js";
 

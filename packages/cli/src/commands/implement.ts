@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadConfig } from "@specforge/core/config";
-import { resolveSpecDir, parseSpecDirName } from "@specforge/core/sequence";
-import { parseSpecMarkdown } from "@specforge/core/specfile";
-import { parseTasksMarkdown } from "@specforge/core/tasks";
+import { loadConfig } from "@specforge-dev/core/config";
+import { resolveSpecDir, parseSpecDirName } from "@specforge-dev/core/sequence";
+import { parseSpecMarkdown } from "@specforge-dev/core/specfile";
+import { parseTasksMarkdown } from "@specforge-dev/core/tasks";
 import { clarifyCommand } from "./clarify.js";
 import { planCommand } from "./plan.js";
 import { tasksCommand } from "./tasks.js";

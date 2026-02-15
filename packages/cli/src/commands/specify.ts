@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadConfig } from "@specforge/core/config";
-import { getNextSequenceNumber, formatSpecDirName } from "@specforge/core/sequence";
-import { slugify, generateSpecMarkdown } from "@specforge/core/specfile";
-import { getGitContext, createBranch } from "@specforge/core/git";
+import { loadConfig } from "@specforge-dev/core/config";
+import { getNextSequenceNumber, formatSpecDirName } from "@specforge-dev/core/sequence";
+import { slugify, generateSpecMarkdown } from "@specforge-dev/core/specfile";
+import { getGitContext, createBranch } from "@specforge-dev/core/git";
 
 export interface SpecifyCommandOptions {
   branch?: boolean;

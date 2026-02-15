@@ -2,7 +2,7 @@ import type {
   ParsedSpec,
   GeneratedFile,
   GenerateOptions,
-} from "@specforge/core";
+} from "@specforge-dev/core";
 import type { SpecForgePlugin } from "../types.js";
 
 function generateAuthMiddleware(spec: ParsedSpec): string {

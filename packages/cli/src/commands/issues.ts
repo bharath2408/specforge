@@ -1,10 +1,10 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execSync } from "node:child_process";
-import { loadConfig } from "@specforge/core/config";
-import { resolveSpecDir } from "@specforge/core/sequence";
-import { getGitContext } from "@specforge/core/git";
-import { parseTasksMarkdown } from "@specforge/core/tasks";
+import { loadConfig } from "@specforge-dev/core/config";
+import { resolveSpecDir } from "@specforge-dev/core/sequence";
+import { getGitContext } from "@specforge-dev/core/git";
+import { parseTasksMarkdown } from "@specforge-dev/core/tasks";
 
 export interface IssuesCommandOptions {
   dryRun?: boolean;

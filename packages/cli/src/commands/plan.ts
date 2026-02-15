@@ -1,12 +1,12 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadConfig } from "@specforge/core/config";
-import { resolveSpecDir } from "@specforge/core/sequence";
+import { loadConfig } from "@specforge-dev/core/config";
+import { resolveSpecDir } from "@specforge-dev/core/sequence";
 import {
   generatePlan,
   generatePlanMarkdown,
   generateDataModelMarkdown,
-} from "@specforge/core/planner";
+} from "@specforge-dev/core/planner";
 
 export async function planCommand(specId: string): Promise<void> {
   if (!specId) {

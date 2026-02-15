@@ -1,8 +1,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadConfig } from "@specforge/core/config";
-import { resolveSpecDir } from "@specforge/core/sequence";
-import { scanForAmbiguities, generateCoverageTable } from "@specforge/core/ambiguity";
+import { loadConfig } from "@specforge-dev/core/config";
+import { resolveSpecDir } from "@specforge-dev/core/sequence";
+import { scanForAmbiguities, generateCoverageTable } from "@specforge-dev/core/ambiguity";
 
 export async function clarifyCommand(specId: string): Promise<void> {
   if (!specId) {

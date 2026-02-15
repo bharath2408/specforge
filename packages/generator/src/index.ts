@@ -1,4 +1,4 @@
-import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge/core";
+import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge-dev/core";
 import { modelPlugin } from "./plugins/model.js";
 import { prismaPlugin } from "./plugins/prisma.js";
 import { fastifyPlugin } from "./plugins/fastify.js";

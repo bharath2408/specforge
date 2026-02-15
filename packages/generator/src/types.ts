@@ -1,4 +1,4 @@
-import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge/core";
+import type { ParsedSpec, GeneratedFile, GenerateOptions } from "@specforge-dev/core";
 
 export interface SpecForgePlugin {
   name: string;

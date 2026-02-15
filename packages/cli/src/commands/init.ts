@@ -110,7 +110,7 @@ const PACKAGE_JSON_TEMPLATE = (name: string) =>
         "@prisma/client": "^6.0.0",
       },
       devDependencies: {
-        "@specforge/cli": "^0.1.0",
+        "@specforge-dev/cli": "^0.1.0",
         typescript: "^5.7.0",
         prisma: "^6.0.0",
         vitest: "^3.0.0",

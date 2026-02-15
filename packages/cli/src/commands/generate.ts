@@ -3,8 +3,8 @@ import {
   parseSpecFile,
   discoverSpecFiles,
   validateSpecOrThrow,
-} from "@specforge/core";
-import { generate, getBuiltinPlugins } from "@specforge/generator";
+} from "@specforge-dev/core";
+import { generate, getBuiltinPlugins } from "@specforge-dev/generator";
 import { findSpecDir, writeGeneratedFile } from "../utils.js";
 
 export interface GenerateCommandOptions {

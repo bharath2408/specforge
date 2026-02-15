@@ -1,11 +1,11 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadConfig } from "@specforge/core/config";
-import { resolveSpecDir } from "@specforge/core/sequence";
+import { loadConfig } from "@specforge-dev/core/config";
+import { resolveSpecDir } from "@specforge-dev/core/sequence";
 import {
   analyzeConsistency,
   generateAnalysisMarkdown,
-} from "@specforge/core/analyzer";
+} from "@specforge-dev/core/analyzer";
 import { findSpecDir } from "../utils.js";
 
 export async function analyzeCommand(specId?: string): Promise<void> {

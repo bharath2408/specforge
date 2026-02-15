@@ -5,7 +5,7 @@ import type {
   FieldSpec,
   EndpointSpec,
   CrudAction,
-} from "@specforge/core";
+} from "@specforge-dev/core";
 import type { SpecForgePlugin } from "../types.js";
 
 function mapFieldToJsonSchemaType(field: FieldSpec): { type: string; format?: string; enum?: string[] } {

@@ -1,5 +1,5 @@
 {
-  "name": "@specforge/generator",
+  "name": "@specforge-dev/generator",
   "version": "1.0.3",
   "description": "Code generation engine for SpecForge",
   "main": "dist/index.js",
@@ -10,7 +10,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@specforge/core": "workspace:*",
+    "@specforge-dev/core": "workspace:*",
     "handlebars": "^4.7.8"
   },
   "devDependencies": {

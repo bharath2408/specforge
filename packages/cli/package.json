@@ -1,5 +1,5 @@
 {
-  "name": "@specforge/cli",
+  "name": "@specforge-dev/cli",
   "version": "1.0.3",
   "description": "CLI interface for SpecForge",
   "main": "dist/index.js",
@@ -13,8 +13,8 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@specforge/core": "workspace:*",
-    "@specforge/generator": "workspace:*",
+    "@specforge-dev/core": "workspace:*",
+    "@specforge-dev/generator": "workspace:*",
     "chalk": "^5.4.0",
     "commander": "^13.0.0",
     "ora": "^8.2.0"

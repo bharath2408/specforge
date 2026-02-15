@@ -1,4 +1,4 @@
-import { parseSpecFile, discoverSpecFiles, validateSpec } from "@specforge/core";
+import { parseSpecFile, discoverSpecFiles, validateSpec } from "@specforge-dev/core";
 import { findSpecDir } from "../utils.js";
 
 export async function validateCommand(specPath?: string): Promise<void> {
