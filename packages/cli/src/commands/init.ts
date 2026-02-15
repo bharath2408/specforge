@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import YAML from "yaml";
 
 const EXAMPLE_SPEC = `specforge: "1.0"
 name: my-app
@@ -144,7 +145,9 @@ const TSCONFIG_TEMPLATE = JSON.stringify(
 // Claude Code Integration — CLAUDE.md + Slash Commands
 // ──────────────────────────────────────────────────────────────
 
-const CLAUDE_MD = `# SpecForge — Spec-Driven Development Workflow
+export const CLI_VERSION = "1.0.4";
+
+export const CLAUDE_MD = `# SpecForge — Spec-Driven Development Workflow
 
 This project uses **SpecForge** for spec-driven development.
 
@@ -229,7 +232,7 @@ docs/                        # Generated API docs + OpenAPI + ER diagram
 \`\`\`
 `;
 
-const SLASH_COMMANDS: Record<string, string> = {
+export const SLASH_COMMANDS: Record<string, string> = {
   "specforge-init": `Initialize SpecForge in the current project.
 
 Run \`specforge init .\` to add a \`spec/\` directory with an example \`app.spec.yaml\` to this project. Do NOT create a new subdirectory — init in-place.
@@ -361,10 +364,11 @@ This is the complete Constitution > Specify > Clarify > Plan > Tasks > Analyze >
 function writeClaudeIntegration(targetDir: string): number {
   let count = 0;
 
-  // Write CLAUDE.md
+  // Write CLAUDE.md with markers
   const claudeMdPath = path.join(targetDir, "CLAUDE.md");
   if (!fs.existsSync(claudeMdPath)) {
-    fs.writeFileSync(claudeMdPath, CLAUDE_MD, "utf-8");
+    const wrappedContent = `<!-- specforge:start -->\n${CLAUDE_MD}<!-- specforge:end -->\n`;
+    fs.writeFileSync(claudeMdPath, wrappedContent, "utf-8");
     count++;
     const relative = path.relative(process.cwd(), claudeMdPath);
     console.log(`  Created ${relative}`);
@@ -425,6 +429,15 @@ export async function initCommand(projectName?: string): Promise<void> {
   console.log(`  Setting up Claude Code integration...`);
   const claudeFileCount = writeClaudeIntegration(targetDir);
   console.log(`  Claude Code: ${claudeFileCount} files created (CLAUDE.md + ${Object.keys(SLASH_COMMANDS).length} slash commands)`);
+
+  // Write .specforge/version.yaml
+  const specforgeDir = path.join(targetDir, ".specforge");
+  fs.mkdirSync(specforgeDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(specforgeDir, "version.yaml"),
+    YAML.stringify({ version: CLI_VERSION }),
+    "utf-8"
+  );
 
   if (initInPlace) {
     console.log(`\nDone! SpecForge initialized in your project.\n`);

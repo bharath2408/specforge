@@ -65,6 +65,20 @@ export {
   generateBrainstormMarkdown,
 } from "./brainstorm.js";
 
+// Phase 5: Custom Commands
+export {
+  loadCustomCommands,
+  saveCustomCommands,
+  isBuiltInCommand,
+  addCustomCommand,
+  editCustomCommand,
+  removeCustomCommand,
+  getCustomCommand,
+  listCustomCommands,
+  extractVariables,
+  substituteVariables,
+} from "./custom-commands.js";
+
 // Types
 export type {
   FieldType,
@@ -111,4 +125,9 @@ export type {
   ValueAddSuggestion,
   BrainstormReport,
   CompetitorComparisonRow,
+  CustomCommandVariable,
+  CustomCommandDefinition,
+  CustomCommandsFile,
+  FileChangeEntry,
+  UpdateResult,
 } from "./types.js";

@@ -278,6 +278,31 @@ specforge watch
 specforge watch --auto-generate    # Also auto-generate on changes
 ```
 
+#### `specforge update [options]`
+
+Sync project integration files (CLAUDE.md, slash commands) with the currently installed CLI version. Run this after upgrading SpecForge globally to receive new slash commands and updated CLAUDE.md content.
+
+```bash
+specforge update             # Sync files to current CLI version
+specforge update --dry-run   # Preview changes without writing files
+specforge update --force     # Force re-sync even if versions match
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Preview what would change without writing files |
+| `--force` | Force update even if the project version matches the CLI version |
+
+**How it works:**
+
+1. Checks for `.specforge/version.yaml` to determine the project's current integration version
+2. Compares against the installed CLI version — skips if already up to date
+3. Syncs slash commands in `.claude/commands/` — adds new, updates changed, skips matching
+4. Updates the managed section of `CLAUDE.md` between `<!-- specforge:start -->` / `<!-- specforge:end -->` markers
+5. Writes the new version to `.specforge/version.yaml`
+
 #### `specforge remove [options]`
 
 Remove SpecForge integration from the current project.
@@ -420,7 +445,7 @@ SpecForge is built as a pnpm monorepo with 4 packages:
 ```
 packages/
 ├── core/              — Types, parsing, validation, planning, brainstorm analysis
-├── cli/               — Commander.js CLI with 16 commands
+├── cli/               — Commander.js CLI with 17 commands
 ├── generator/         — Handlebars-based code generation with 6 plugins
 └── create-specforge/  — Project scaffolding (npx create-specforge)
 ```

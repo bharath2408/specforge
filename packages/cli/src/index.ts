@@ -17,6 +17,16 @@ import { issuesCommand } from "./commands/issues.js";
 import { removeCommand } from "./commands/remove.js";
 import { implementCommand } from "./commands/implement.js";
 import { brainstormCommand } from "./commands/brainstorm.js";
+import { updateCommand } from "./commands/update.js";
+import {
+  commandAddHandler,
+  commandListHandler,
+  commandEditHandler,
+  commandRemoveHandler,
+  commandShowHandler,
+} from "./commands/command.js";
+import { isBuiltInCommand, getCustomCommand } from "@specforge-dev/core/custom-commands";
+import { executeCustomCommand } from "./custom-command-runner.js";
 
 const program = new Command();
 
@@ -178,4 +188,94 @@ program
     await removeCommand({ force: opts.force });
   });
 
-program.parse();
+program
+  .command("update")
+  .description("Sync project integration files (CLAUDE.md, slash commands) with installed CLI version")
+  .option("--dry-run", "Preview changes without writing files")
+  .option("--force", "Force update even if versions match")
+  .action(async (opts) => {
+    await updateCommand({ dryRun: opts.dryRun, force: opts.force });
+  });
+
+// ──────────────────────────────────────────────────────────────
+// Custom Commands
+// ──────────────────────────────────────────────────────────────
+
+const commandGroup = program
+  .command("command")
+  .description("Manage custom command shortcuts");
+
+commandGroup
+  .command("add <name>")
+  .description("Register a new custom command")
+  .requiredOption("--run <command>", "Command string to execute")
+  .option("--description <text>", "Description of the command")
+  .option("--alias <alias>", "Short alias for the command")
+  .action(async (name: string, opts) => {
+    await commandAddHandler(name, {
+      run: opts.run,
+      description: opts.description,
+      alias: opts.alias,
+    });
+  });
+
+commandGroup
+  .command("list")
+  .description("List all custom commands")
+  .action(async () => {
+    await commandListHandler();
+  });
+
+commandGroup
+  .command("edit <name>")
+  .description("Update an existing custom command")
+  .option("--run <command>", "New command string")
+  .option("--description <text>", "New description")
+  .option("--alias <alias>", "New alias")
+  .action(async (name: string, opts) => {
+    await commandEditHandler(name, {
+      run: opts.run,
+      description: opts.description,
+      alias: opts.alias,
+    });
+  });
+
+commandGroup
+  .command("remove <name>")
+  .description("Remove a custom command")
+  .action(async (name: string) => {
+    await commandRemoveHandler(name);
+  });
+
+commandGroup
+  .command("show <name>")
+  .description("Show details of a custom command")
+  .action(async (name: string) => {
+    await commandShowHandler(name);
+  });
+
+// ──────────────────────────────────────────────────────────────
+// Entry point with custom command interception
+// ──────────────────────────────────────────────────────────────
+
+async function main(): Promise<void> {
+  const subcommand = process.argv[2];
+
+  // If no subcommand or it's a built-in, let Commander handle it
+  if (!subcommand || subcommand.startsWith("-") || isBuiltInCommand(subcommand)) {
+    await program.parseAsync();
+    return;
+  }
+
+  // Check if it's a custom command or alias
+  const custom = getCustomCommand(subcommand);
+  if (custom) {
+    const exitCode = executeCustomCommand(subcommand, process.argv.slice(3));
+    process.exit(exitCode);
+  }
+
+  // Fall through to Commander (will show help/error for unknown commands)
+  await program.parseAsync();
+}
+
+main();

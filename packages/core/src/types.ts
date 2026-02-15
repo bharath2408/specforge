@@ -325,3 +325,41 @@ export interface CompetitorComparisonRow {
   currentSpec: "planned" | "partial" | "missing";
   competitors: Record<string, "yes" | "no" | "partial" | "unknown">;
 }
+
+// ──────────────────────────────────────────────────────────────
+// Custom Commands
+// ──────────────────────────────────────────────────────────────
+
+export interface CustomCommandVariable {
+  name: string;
+  description?: string;
+  default?: string;
+}
+
+export interface CustomCommandDefinition {
+  name: string;
+  description?: string;
+  run: string;
+  alias?: string;
+  variables?: CustomCommandVariable[];
+}
+
+export interface CustomCommandsFile {
+  commands: CustomCommandDefinition[];
+}
+
+// ──────────────────────────────────────────────────────────────
+// Update
+// ──────────────────────────────────────────────────────────────
+
+export interface FileChangeEntry {
+  file: string;
+  action: "added" | "updated" | "unchanged" | "skipped";
+}
+
+export interface UpdateResult {
+  fromVersion: string;
+  toVersion: string;
+  changes: FileChangeEntry[];
+  dryRun: boolean;
+}
