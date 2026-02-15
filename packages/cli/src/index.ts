@@ -19,6 +19,7 @@ import { implementCommand } from "./commands/implement.js";
 import { brainstormCommand } from "./commands/brainstorm.js";
 import { updateCommand } from "./commands/update.js";
 import { reviewCommand } from "./commands/review.js";
+import { testE2eCommand } from "./commands/test-e2e.js";
 import {
   commandAddHandler,
   commandListHandler,
@@ -170,6 +171,20 @@ program
       strict: opts.strict,
       ci: opts.ci,
       minScore: opts.minScore,
+    });
+  });
+
+program
+  .command("test-e2e")
+  .description("Run Playwright E2E tests against all SpecForge CLI commands")
+  .option("--command <name>", "Test a specific command (e.g., brainstorm, review)")
+  .option("--suite <name>", "Run a test suite: pipeline, errors, or a command name")
+  .option("--workers <n>", "Number of parallel workers")
+  .action(async (opts) => {
+    await testE2eCommand({
+      command: opts.command,
+      suite: opts.suite,
+      workers: opts.workers,
     });
   });
 

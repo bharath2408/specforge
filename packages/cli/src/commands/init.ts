@@ -221,6 +221,12 @@ specforge generate
 specforge diff -v
 \`\`\`
 
+### 11. Run E2E Tests
+\`\`\`bash
+specforge test-e2e
+\`\`\`
+Runs Playwright E2E tests against all CLI commands. Use \`--command <name>\` to test a specific command, \`--suite pipeline\` for the full pipeline test.
+
 ## Available Plugins
 - \`model\` — TypeScript interfaces
 - \`prisma\` — Prisma schema
@@ -232,10 +238,11 @@ specforge diff -v
 ## Key Rules
 1. **Spec first, code second** — Always update the spec before writing code
 2. **Check the constitution** — Read \`memory/constitution.md\` before architectural decisions
-3. **Run the full pipeline** — specify > clarify > review > plan > brainstorm > tasks > analyze > generate
+3. **Run the full pipeline** — specify > clarify > review > plan > brainstorm > tasks > analyze > generate > test-e2e
 4. **Use analyze** — Run \`specforge analyze\` to catch inconsistencies
 5. **Use review** — Run \`specforge review\` to score spec quality before planning
-6. **Keep in sync** — Run \`specforge update\` after upgrading the CLI globally
+6. **Run E2E tests** — Run \`specforge test-e2e\` to verify all commands work correctly
+7. **Keep in sync** — Run \`specforge update\` after upgrading the CLI globally
 
 ## Project Structure
 \`\`\`

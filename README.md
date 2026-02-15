@@ -11,9 +11,9 @@ SpecForge is a complete spec-driven development toolkit that takes you from idea
 SpecForge follows a phased workflow. Each phase produces a markdown artifact that feeds into the next:
 
 ```
-init → constitution → specify → clarify → plan → brainstorm → tasks → analyze → generate
-                                                                                     │
-                                                                    issues ← implement ← test
+init → constitution → specify → clarify → review → plan → brainstorm → tasks → analyze → generate → test-e2e
+                                                                                                        │
+                                                                                       issues ← implement
 ```
 
 | Phase | Command | Input | Output | Purpose |
@@ -22,11 +22,13 @@ init → constitution → specify → clarify → plan → brainstorm → tasks 
 | **Governance** | `constitution` | — | `constitution.md` | Define 9 guiding principles for the project |
 | **Define** | `specify` | Feature name | `spec.md` | Create structured feature spec with scenarios |
 | **Clarify** | `clarify` | `spec.md` | `clarification-log.md` | Scan for ambiguities and coverage gaps |
+| **Review** | `review` | `spec.md` | `review-report.md` | Score spec quality on 5 dimensions (0–100) |
 | **Plan** | `plan` | `spec.md` | `plan.md`, `data-model.md` | Generate implementation plan with phases |
 | **Brainstorm** | `brainstorm` | `spec.md`, `plan.md` | `brainstorm-report.md` | Research competitors and suggest value-add features |
 | **Tasks** | `tasks` | `spec.md` | `tasks.md` | Generate prioritized, dependency-ordered task list |
 | **Analyze** | `analyze` | All artifacts | `analysis-report.md` | Cross-artifact consistency check |
 | **Generate** | `generate` | `.spec.yaml` | Source code | Generate models, routes, tests, schemas |
+| **Test** | `test-e2e` | All commands | HTML report | Playwright E2E tests for all CLI commands |
 | **Implement** | `implement` | `spec.md` | All of the above | Run the full pipeline end-to-end |
 
 ## Quick Start
@@ -263,6 +265,28 @@ Run generated test suites.
 specforge test
 ```
 
+#### `specforge test-e2e [options]`
+
+Run Playwright E2E tests against all SpecForge CLI commands.
+
+```bash
+specforge test-e2e                        # Run all 51 tests
+specforge test-e2e --command brainstorm   # Test a specific command
+specforge test-e2e --suite pipeline       # Run the 10-step pipeline test
+specforge test-e2e --suite errors         # Run error handling tests
+specforge test-e2e --workers 1            # Single worker (sequential)
+```
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--command <name>` | Test a specific command (e.g., brainstorm, review, init) |
+| `--suite <name>` | Run a test suite: `pipeline`, `errors`, or a command name |
+| `--workers <n>` | Number of parallel workers |
+
+Tests run in temporary directories, validate stdout/stderr, exit codes, and generated file contents. The pipeline suite runs all 10 steps sequentially to verify the full workflow.
+
 ### Pipeline & Integration
 
 #### `specforge implement <spec-id> [options]`
@@ -464,7 +488,7 @@ SpecForge is built as a pnpm monorepo with 4 packages:
 ```
 packages/
 ├── core/              — Types, parsing, validation, planning, brainstorm analysis
-├── cli/               — Commander.js CLI with 17 commands
+├── cli/               — Commander.js CLI with 18 commands
 ├── generator/         — Handlebars-based code generation with 6 plugins
 └── create-specforge/  — Project scaffolding (npx create-specforge)
 ```
