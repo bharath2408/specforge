@@ -268,7 +268,7 @@ Run: \`specforge clarify <spec-id>\`
 
 This scans across 10 ambiguity categories: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth, missing error handling, incomplete data model, ambiguous terminology.
 
-After showing findings, help the user fix the ambiguities by editing the spec.md file.`,
+After showing findings, help the user fix the ambiguities by editing the spec.md file. Then suggest running \`specforge review\` to score spec quality, or \`specforge plan\` to generate an implementation plan.`,
 
   "specforge-plan": `Generate an implementation plan from a feature spec.
 
@@ -278,7 +278,7 @@ Run: \`specforge plan <spec-id>\`
 
 This generates \`plan.md\` (phases, constitutional compliance, file changes) and \`data-model.md\` (ER diagram + entity details) in the spec directory.
 
-After generation, review the plan with the user and suggest running \`specforge tasks\` next.`,
+After generation, review the plan with the user and suggest running \`specforge brainstorm\` to research competitors, or \`specforge tasks\` to generate a task list.`,
 
   "specforge-tasks": `Generate a task list from a feature spec.
 
