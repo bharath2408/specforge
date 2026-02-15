@@ -1,6 +1,6 @@
 {
   "name": "@specforge-dev/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Spec parser, validator, and schema engine for SpecForge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -63,7 +63,12 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "keywords": ["specforge", "spec", "parser", "validator"],
+  "keywords": [
+    "specforge",
+    "spec",
+    "parser",
+    "validator"
+  ],
   "author": "Bharath Kumar",
   "license": "MIT"
 }

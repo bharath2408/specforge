@@ -1,6 +1,6 @@
 {
   "name": "create-specforge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Scaffold a new SpecForge project",
   "main": "dist/index.js",
   "bin": {
@@ -19,7 +19,11 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "keywords": ["specforge", "scaffolder", "create"],
+  "keywords": [
+    "specforge",
+    "scaffolder",
+    "create"
+  ],
   "author": "Bharath Kumar",
   "license": "MIT"
 }

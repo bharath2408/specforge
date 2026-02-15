@@ -1,6 +1,6 @@
 {
   "name": "@specforge-dev/cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CLI interface for SpecForge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,7 +24,10 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "keywords": ["specforge", "cli"],
+  "keywords": [
+    "specforge",
+    "cli"
+  ],
   "author": "Bharath Kumar",
   "license": "MIT"
 }

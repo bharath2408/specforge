@@ -1,6 +1,6 @@
 {
   "name": "@specforge-dev/specforge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Spec-Driven Development Kit",
   "scripts": {
     "build": "pnpm -r build",
@@ -8,7 +8,12 @@
     "test": "pnpm -r test",
     "lint": "pnpm -r lint"
   },
-  "keywords": ["spec-driven", "code-generation", "sdlc", "toolkit"],
+  "keywords": [
+    "spec-driven",
+    "code-generation",
+    "sdlc",
+    "toolkit"
+  ],
   "author": "Bharath Kumar",
   "license": "MIT",
   "engines": {

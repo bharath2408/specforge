@@ -1,6 +1,6 @@
 {
   "name": "@specforge-dev/generator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Code generation engine for SpecForge",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,11 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "keywords": ["specforge", "generator", "code-generation"],
+  "keywords": [
+    "specforge",
+    "generator",
+    "code-generation"
+  ],
   "author": "Bharath Kumar",
   "license": "MIT"
 }
