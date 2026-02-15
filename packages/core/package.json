@@ -52,6 +52,10 @@
     "./custom-commands": {
       "types": "./dist/custom-commands.d.ts",
       "default": "./dist/custom-commands.js"
+    },
+    "./reviewer": {
+      "types": "./dist/reviewer.d.ts",
+      "default": "./dist/reviewer.js"
     }
   },
   "scripts": {

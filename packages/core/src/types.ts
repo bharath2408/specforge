@@ -349,6 +349,44 @@ export interface CustomCommandsFile {
 }
 
 // ──────────────────────────────────────────────────────────────
+// Review
+// ──────────────────────────────────────────────────────────────
+
+export type ReviewDimension = "completeness" | "clarity" | "testability" | "feasibility" | "consistency";
+export type ReviewVerdict = "EXCELLENT" | "GOOD" | "NEEDS_WORK" | "POOR";
+
+export interface ReviewFinding {
+  dimension: ReviewDimension;
+  severity: Severity;
+  message: string;
+  suggestion: string;
+  location?: string;
+}
+
+export interface DimensionScore {
+  dimension: ReviewDimension;
+  score: number;
+  maxScore: 20;
+  findings: ReviewFinding[];
+  summary: string;
+}
+
+export interface ReviewReport {
+  specId: string;
+  generatedAt: string;
+  totalScore: number;
+  verdict: ReviewVerdict;
+  dimensions: DimensionScore[];
+  topSuggestions: string[];
+}
+
+export interface ReviewOptions {
+  focus?: ReviewDimension[];
+  strict?: boolean;
+  minScore?: number;
+}
+
+// ──────────────────────────────────────────────────────────────
 // Update
 // ──────────────────────────────────────────────────────────────
 

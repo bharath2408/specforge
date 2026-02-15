@@ -65,6 +65,9 @@ export {
   generateBrainstormMarkdown,
 } from "./brainstorm.js";
 
+// Phase 6: Review
+export { reviewSpec, generateReviewMarkdown } from "./reviewer.js";
+
 // Phase 5: Custom Commands
 export {
   loadCustomCommands,
@@ -130,4 +133,10 @@ export type {
   CustomCommandsFile,
   FileChangeEntry,
   UpdateResult,
+  ReviewDimension,
+  ReviewFinding,
+  DimensionScore,
+  ReviewVerdict,
+  ReviewReport,
+  ReviewOptions,
 } from "./types.js";

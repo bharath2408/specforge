@@ -18,6 +18,7 @@ import { removeCommand } from "./commands/remove.js";
 import { implementCommand } from "./commands/implement.js";
 import { brainstormCommand } from "./commands/brainstorm.js";
 import { updateCommand } from "./commands/update.js";
+import { reviewCommand } from "./commands/review.js";
 import {
   commandAddHandler,
   commandListHandler,
@@ -150,6 +151,22 @@ program
   .description("Cross-artifact consistency check")
   .action(async (specId?: string) => {
     await analyzeCommand(specId);
+  });
+
+program
+  .command("review <spec-id>")
+  .description("Score a feature spec on 5 quality dimensions (completeness, clarity, testability, feasibility, consistency)")
+  .option("--focus <areas...>", "Only score specific dimensions")
+  .option("--strict", "Use stricter scoring thresholds")
+  .option("--ci", "CI mode: exit with code 1 if below --min-score or verdict is POOR")
+  .option("--min-score <n>", "Minimum passing score for --ci mode", parseInt)
+  .action(async (specId: string, opts) => {
+    await reviewCommand(specId, {
+      focus: opts.focus,
+      strict: opts.strict,
+      ci: opts.ci,
+      minScore: opts.minScore,
+    });
   });
 
 program

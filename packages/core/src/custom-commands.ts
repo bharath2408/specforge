@@ -29,6 +29,7 @@ const BUILT_IN_COMMANDS = new Set([
   "remove",
   "command",
   "update",
+  "review",
 ]);
 
 const VARIABLE_NAME_RE = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
