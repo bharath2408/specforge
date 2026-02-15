@@ -1,7 +1,6 @@
 {
-  "name": "specforge",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@specforge-driven/specforge",
+  "version": "1.0.2",
   "description": "Spec-Driven Development Kit by d2railabs",
   "scripts": {
     "build": "pnpm -r build",

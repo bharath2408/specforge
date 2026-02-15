@@ -1,6 +1,6 @@
 {
   "name": "create-specforge",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "description": "Scaffold a new SpecForge project",
   "main": "dist/index.js",
   "bin": {
