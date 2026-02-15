@@ -64,6 +64,6 @@
     "typescript": "^5.7.0"
   },
   "keywords": ["specforge", "spec", "parser", "validator"],
-  "author": "d2railabs",
+  "author": "Bharath Kumar",
   "license": "MIT"
 }

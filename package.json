@@ -1,7 +1,7 @@
 {
   "name": "@specforge-dev/specforge",
   "version": "1.0.3",
-  "description": "Spec-Driven Development Kit by d2railabs",
+  "description": "Spec-Driven Development Kit",
   "scripts": {
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
@@ -9,7 +9,7 @@
     "lint": "pnpm -r lint"
   },
   "keywords": ["spec-driven", "code-generation", "sdlc", "toolkit"],
-  "author": "d2railabs",
+  "author": "Bharath Kumar",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0",

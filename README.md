@@ -1,6 +1,6 @@
 # SpecForge
 
-Spec-Driven Development Kit by **d2railabs** — Define features with structured specs, generate production-ready code, and ship with confidence.
+Spec-Driven Development Kit — Define features with structured specs, generate production-ready code, and ship with confidence.
 
 ## What is SpecForge?
 

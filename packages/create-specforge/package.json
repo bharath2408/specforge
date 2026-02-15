@@ -20,6 +20,6 @@
     "typescript": "^5.7.0"
   },
   "keywords": ["specforge", "scaffolder", "create"],
-  "author": "d2railabs",
+  "author": "Bharath Kumar",
   "license": "MIT"
 }

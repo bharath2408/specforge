@@ -22,7 +22,7 @@ const program = new Command();
 
 program
   .name("specforge")
-  .description("SpecForge — Spec-Driven Development Kit by d2railabs")
+  .description("SpecForge — Spec-Driven Development Kit")
   .version("0.1.0");
 
 program
