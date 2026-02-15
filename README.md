@@ -139,11 +139,14 @@ Produces:
 
 Analyze the spec and plan, research competitors on npm and GitHub, identify feature gaps, and generate value-add suggestions.
 
+**Smart tool selection:** The brainstorm command automatically analyzes spec content (entities, requirements, keywords) to decide which research tools to trigger. Infrastructure specs skip npm/GitHub search, UI specs enable screenshots, and specs with protocol keywords (OAuth, JWT, GraphQL) trigger GitHub search. A tool selection summary is printed before research starts.
+
 ```bash
-specforge brainstorm 001-user-authentication                    # Full online mode
+specforge brainstorm 001-user-authentication                    # Auto-select tools based on spec
 specforge brainstorm 001-user-authentication --offline          # Heuristics only
 specforge brainstorm 001-user-authentication --urls https://auth0.com https://clerk.com
-specforge brainstorm 001-user-authentication --skip-screenshots
+specforge brainstorm 001-user-authentication --include all      # Force all tools on
+specforge brainstorm 001-user-authentication --exclude npm,github  # Force specific tools off
 specforge brainstorm 001-user-authentication --npm-keywords oauth jwt
 ```
 
@@ -155,16 +158,31 @@ specforge brainstorm 001-user-authentication --npm-keywords oauth jwt
 | `--urls <urls...>` | Competitor URLs to analyze |
 | `--skip-screenshots` | Skip taking screenshots (still does research) |
 | `--npm-keywords <kw...>` | Additional npm search keywords |
+| `--include <tools...>` | Force-enable tools: `npm`, `github`, `screenshots`, `all` |
+| `--exclude <tools...>` | Force-disable tools: `npm`, `github`, `screenshots` |
 
 **What it does:**
 
-1. Extracts search keywords from spec entities, requirements, and scenarios
-2. Searches npm registry and GitHub for similar/competing projects
-3. Fetches and analyzes user-provided competitor URLs
-4. Captures competitor screenshots (requires Chrome/Chromium installed)
-5. Generates side-by-side comparison image
-6. Checks for 16 commonly missing patterns (pagination, caching, rate limiting, RBAC, i18n, audit logging, webhooks, export/import, etc.)
-7. Produces prioritized suggestions (P1/P2/P3) with rationale
+1. Analyzes spec content for keyword signals across 4 categories (npm, UI, infrastructure, protocol)
+2. Auto-selects which research tools to enable based on spec domain and signals
+3. Prints a tool selection summary showing ON/OFF for each tool with reasons
+4. Extracts search keywords from spec entities, requirements, and scenarios
+5. Searches npm registry and GitHub for similar/competing projects (when selected)
+6. Fetches and analyzes user-provided competitor URLs
+7. Captures competitor screenshots (when selected, requires Chrome/Chromium)
+8. Generates side-by-side comparison image
+9. Checks for 16 commonly missing patterns (pagination, caching, rate limiting, RBAC, i18n, audit logging, webhooks, export/import, etc.)
+10. Produces prioritized suggestions (P1/P2/P3) with rationale
+
+**Tool selection logic:**
+
+| Tool | Auto-enabled when | Auto-skipped when |
+|------|-------------------|-------------------|
+| npm search | Auth, validation, payment, or other library keywords detected | Infrastructure/internal features |
+| GitHub search | Protocol keywords (OAuth, JWT, GraphQL) or high external dependency likelihood | Tightly coupled to project internals |
+| URL fetch | User provides `--urls` | No URLs provided |
+| Screenshots | UI/frontend spec AND competitor URLs available | Backend/CLI/infrastructure features |
+| Heuristics | Always | Never |
 
 **Output:** `brainstorm-report.md` with sections:
 - Competitors Analyzed (table)
@@ -175,11 +193,12 @@ specforge brainstorm 001-user-authentication --npm-keywords oauth jwt
 - Recommendations Summary (P1/P2/P3)
 
 **Edge cases handled:**
+- Insufficient keyword signals: falls back to enabling all tools
 - Offline mode works with 0 competitors using heuristic analysis
 - Network failures auto-fallback to offline
 - Chrome not found: skips screenshots with warning
 - GitHub rate limit (403/429): warns and suggests `GITHUB_TOKEN`
-- Invalid user URLs: logs per-URL errors, continues with others
+- `--include` and `--exclude` both specified for same tool: `--exclude` wins
 
 #### `specforge tasks <spec-id>`
 
