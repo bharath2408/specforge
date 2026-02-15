@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import {
   getCustomCommand,
   substituteVariables,
-} from "@specforge-dev/core/custom-commands";
+} from "@specforge-dev/core";
 
 export function parseCustomArgs(rawArgs: string[]): {
   positional: string[];

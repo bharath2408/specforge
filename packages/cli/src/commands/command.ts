@@ -4,7 +4,8 @@ import {
   removeCustomCommand,
   getCustomCommand,
   listCustomCommands,
-} from "@specforge-dev/core/custom-commands";
+} from "@specforge-dev/core";
+import type { CustomCommandVariable } from "@specforge-dev/core";
 
 export async function commandAddHandler(
   name: string,
@@ -22,7 +23,7 @@ export async function commandAddHandler(
     }
     if (command.variables && command.variables.length > 0) {
       console.log(
-        `  Variables: ${command.variables.map((v) => `{${v.name}}`).join(", ")}`
+        `  Variables: ${command.variables.map((v: CustomCommandVariable) => `{${v.name}}`).join(", ")}`
       );
     }
     console.log();

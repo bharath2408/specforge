@@ -25,7 +25,7 @@ import {
   commandRemoveHandler,
   commandShowHandler,
 } from "./commands/command.js";
-import { isBuiltInCommand, getCustomCommand } from "@specforge-dev/core/custom-commands";
+import { isBuiltInCommand, getCustomCommand } from "@specforge-dev/core";
 import { executeCustomCommand } from "./custom-command-runner.js";
 
 const program = new Command();
