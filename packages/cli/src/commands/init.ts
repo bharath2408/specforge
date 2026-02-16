@@ -179,7 +179,7 @@ Creates \`specs/NNN-feature-name/spec.md\`. Edit this file to define:
 \`\`\`bash
 specforge clarify <spec-id>
 \`\`\`
-Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Generates \`clarification-log.md\` and \`implementation.md\` (entity map, prioritized recommendations, open question context, cross-references, and reusable patterns from previous specs). Fix findings before proceeding.
+Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Generates \`clarification-log.md\` and \`implementation.md\` (entity map, prioritized recommendations, open question context, cross-references, and reusable patterns from previous specs). Auto-backfills \`implementation.md\` for older specs that lack it. Fix findings before proceeding.
 
 ### 4. Review Spec Quality
 \`\`\`bash
@@ -309,6 +309,8 @@ Outputs two files:
 - \`clarification-log.md\` — flat log of all findings and coverage table
 - \`implementation.md\` — structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs .spec.yaml), and reusable patterns from previous specs
 
+**Cross-spec pattern reuse:** When clarifying a new spec, the command loads \`implementation.md\` from all previous spec directories to carry forward reusable patterns. If an older spec has \`clarification-log.md\` but no \`implementation.md\` (created before this feature), it auto-backfills by re-scanning that spec and writing the missing file.
+
 After showing findings, help the user fix the ambiguities by editing the spec.md file. Then suggest running \`specforge review\` to score spec quality, or \`specforge plan\` to generate an implementation plan.`,
 
   "specforge-plan": `Generate an implementation plan from a feature spec.
@@ -367,7 +369,7 @@ If $ARGUMENTS is provided, use it as the spec-id. Otherwise, list available spec
 Run: \`specforge implement <spec-id>\`
 
 This runs the entire pipeline automatically:
-1. Clarify — scan for ambiguities (skipped if already done)
+1. Clarify — scan for ambiguities and generate implementation notes (skipped if both \`clarification-log.md\` and \`implementation.md\` exist; re-runs if \`implementation.md\` is missing)
 2. Plan — generate implementation plan (skipped if already done)
 3. Tasks — generate task list (skipped if already done)
 4. Analyze — consistency check

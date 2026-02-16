@@ -165,6 +165,8 @@ specforge clarify 001-user-authentication
 - `clarification-log.md` — Flat log of all findings with coverage table
 - `implementation.md` — Structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs `.spec.yaml`), and reusable patterns from previous specs
 
+**Cross-spec pattern reuse:** When clarifying a new spec, the command loads `implementation.md` from all previous spec directories to carry forward reusable patterns. If an older spec has `clarification-log.md` but no `implementation.md` (created before this feature), it auto-backfills by re-scanning that spec and writing the missing file. This ensures patterns accumulate across specs over time.
+
 #### `specforge review <spec-id> [options]`
 
 Score a feature spec on 5 quality dimensions (0–20 each, totaling 0–100).
@@ -426,7 +428,7 @@ specforge implement 001-user-authentication -p model prisma fastify
 
 **Pipeline steps** (auto-skips if artifacts already exist):
 
-1. **Clarify** — Scan for ambiguities (skipped if `clarification-log.md` exists)
+1. **Clarify** — Scan for ambiguities and generate implementation notes (skipped if both `clarification-log.md` and `implementation.md` exist; re-runs if `implementation.md` is missing)
 2. **Plan** — Generate implementation plan (skipped if `plan.md` exists)
 3. **Tasks** — Generate task list (skipped if `tasks.md` exists)
 4. **Analyze** — Cross-artifact consistency check (always runs)
