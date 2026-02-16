@@ -19,9 +19,9 @@ init → constitution → specify → clarify → review → plan → brainstorm
 | Phase | Command | Input | Output | Purpose |
 |-------|---------|-------|--------|---------|
 | **Setup** | `init` | — | Project scaffold | Create project structure with example spec |
-| **Governance** | `constitution` | — | `constitution.md` | Define 9 guiding principles for the project |
+| **Governance** | `constitution` | — | `constitution.md` | Define 9 guiding principles with auto-detected project context |
 | **Define** | `specify` | Feature name | `spec.md` | Create structured feature spec with scenarios |
-| **Clarify** | `clarify` | `spec.md` | `clarification-log.md`, `implementation.md` | Scan for ambiguities and generate implementation notes |
+| **Clarify** | `clarify` | `spec.md` | `clarification-log.md`, `implementation.md` | Scan for 15 categories of ambiguity and generate implementation notes |
 | **Review** | `review` | `spec.md` | `review-report.md` | Score spec quality on 5 dimensions (0–100) |
 | **Plan** | `plan` | `spec.md` | `plan.md`, `data-model.md` | Generate implementation plan with phases |
 | **Brainstorm** | `brainstorm` | `spec.md`, `plan.md` | `brainstorm-report.md` | Research competitors and suggest value-add features |
@@ -42,15 +42,23 @@ cd my-app
 # Or initialize in an existing project
 npx specforge init .
 
+# Define project principles (auto-detects tech stack)
+specforge constitution
+
 # Define your feature
 specforge specify user-authentication
 
 # Walk through the pipeline
 specforge clarify 001-user-authentication
+specforge review 001-user-authentication
 specforge plan 001-user-authentication
 specforge brainstorm 001-user-authentication
 specforge tasks 001-user-authentication
 specforge analyze 001-user-authentication
+
+# Generate code
+specforge validate
+specforge generate
 
 # Or run everything at once
 specforge implement 001-user-authentication
@@ -72,7 +80,7 @@ npx specforge <command>
 
 #### `specforge init [project-name]`
 
-Scaffold a new SpecForge project with example spec, config file, constitution, and Claude Code integration.
+Scaffold a new SpecForge project with example spec and Claude Code integration (CLAUDE.md + slash commands).
 
 ```bash
 specforge init my-api
@@ -80,19 +88,32 @@ specforge init .    # Initialize in current directory
 ```
 
 Creates:
-- `spec/app.spec.yaml` — Example API spec
-- `specforge.config.yaml` — Project configuration
-- `memory/constitution.md` — Project constitution
-- `CLAUDE.md` — Claude Code integration
+- `spec/app.spec.yaml` — Example API spec with models, endpoints, and tests
+- `CLAUDE.md` — Claude Code integration with workflow instructions
+- `.claude/commands/` — 16 slash commands for Claude Code
+- `.specforge/version.yaml` — CLI version tracking for `specforge update`
+
+When creating a new project (not init in-place), also scaffolds `package.json`, `tsconfig.json`, and `src/` directory structure.
 
 #### `specforge constitution [options]`
 
-Create or amend the project constitution — 9 guiding principles that govern the project.
+Create or amend the project constitution — 9 guiding principles that govern the project, with auto-detected project context.
 
 ```bash
-specforge constitution                          # Create default constitution
+specforge constitution                          # Create with auto project analysis
+specforge constitution --skip-analysis          # Skip project analysis
 specforge constitution --amend "Add rate limiting rule" --article A2
 ```
+
+**Auto-analysis** (enabled by default): Detects your project's tech stack (frameworks, ORM, testing, bundler, CSS), classifies the project type (frontend/backend/fullstack/library/CLI/monorepo), and generates a "Project Context" section with architecture flow and best practices. Use `--skip-analysis` to skip. For new projects without `package.json`, interactive prompts ask for project details.
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--amend <description>` | Add an amendment to the constitution |
+| `--article <id>` | Article ID affected by the amendment |
+| `--skip-analysis` | Skip project analysis and create constitution without Project Context |
 
 The 9 default articles: Library-First, CLI Mandate, Test-First, Simplicity, Anti-Abstraction, Documentation as Code, Backward Compatibility, Single Responsibility, Spec-Driven Development.
 
@@ -114,17 +135,69 @@ Creates `specs/001-user-authentication/spec.md` with:
 
 #### `specforge clarify <spec-id>`
 
-Scan a spec for ambiguities across 15 categories and generate clarification questions.
+Scan a spec for ambiguities across 15 categories and generate implementation notes.
 
 ```bash
 specforge clarify 001-user-authentication
 ```
 
-Checks for: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth rules, missing error handling, incomplete data models, ambiguous terminology, entity relationships, open question suggestions, cross-spec alignment, scenario-entity coverage, and implicit entity detection.
+**15 ambiguity categories:**
 
-Outputs a coverage table and writes two files:
-- `clarification-log.md` — flat log of all findings and coverage table
-- `implementation.md` — structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs .spec.yaml), and reusable patterns from previous specs
+| Category | What it checks |
+|----------|---------------|
+| Placeholder text | Detects TODO, TBD, placeholder content |
+| Empty sections | Sections with no content |
+| Missing priorities | Scenarios without P1/P2/P3 |
+| Undefined entities | Referenced but not listed in Key Entities |
+| Unclear acceptance criteria | Vague success criteria |
+| Missing edge cases | Scenarios without edge case coverage |
+| Undefined auth | Auth-related actions without auth rules |
+| Missing error handling | No error/failure scenarios |
+| Incomplete data model | Entities missing field definitions |
+| Ambiguous terminology | Terms used inconsistently |
+| Entity relationships | Implicit relationships from scenario verb patterns (adds X to Y, belongs to, contains) |
+| Open question suggestions | Open questions that may be answerable from existing spec content |
+| Cross-spec alignment | Key Entities vs `.spec.yaml` model mismatches |
+| Scenario-entity coverage | Entities not appearing in any scenario |
+| Implicit entity detection | PascalCase words and article+Capitalized patterns in scenarios not listed in Key Entities |
+
+**Outputs:**
+- `clarification-log.md` — Flat log of all findings with coverage table
+- `implementation.md` — Structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs `.spec.yaml`), and reusable patterns from previous specs
+
+#### `specforge review <spec-id> [options]`
+
+Score a feature spec on 5 quality dimensions (0–20 each, totaling 0–100).
+
+```bash
+specforge review 001-user-authentication
+specforge review 001-user-authentication --strict
+specforge review 001-user-authentication --ci --min-score 70
+specforge review 001-user-authentication --focus completeness clarity
+```
+
+**Dimensions:**
+
+| Dimension | What it measures |
+|-----------|-----------------|
+| Completeness | Are all sections present and populated? |
+| Clarity | Are descriptions specific and unambiguous? |
+| Testability | Can requirements be verified? |
+| Feasibility | Is scope realistic? |
+| Consistency | Do sections cross-reference correctly? |
+
+**Verdicts:** EXCELLENT (≥80), GOOD (≥60), NEEDS_WORK (≥40), POOR (<40)
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--focus <areas...>` | Only score specific dimensions |
+| `--strict` | Use stricter scoring thresholds |
+| `--ci` | CI mode: exit with code 1 if below `--min-score` or verdict is POOR |
+| `--min-score <n>` | Minimum passing score for `--ci` mode |
+
+Outputs `review-report.md` with score table and top suggestions for improvement.
 
 ### Planning & Analysis
 
@@ -137,7 +210,7 @@ specforge plan 001-user-authentication
 ```
 
 Produces:
-- `plan.md` — Phased implementation plan (Setup, Data Model, Core Logic, API Routes, Testing)
+- `plan.md` — Phased implementation plan (Setup, Data Model, Core Logic, API Routes, Testing) with constitutional compliance
 - `data-model.md` — Entity details with Mermaid ER diagram
 
 #### `specforge brainstorm <spec-id> [options]`
@@ -213,24 +286,39 @@ Generate a dependency-ordered, prioritized task list from the spec.
 specforge tasks 001-user-authentication
 ```
 
-Produces `tasks.md` with tasks organized by phase, each with:
-- Task ID and priority (P1/P2/P3)
+Produces `tasks.md` with tasks organized across 4 phases (Setup > Foundational > User Stories > Polish), each with:
+- Task ID (`[T001]`) and priority (P1/P2/P3)
 - Scenario reference
 - Dependencies
-- Parallel execution flag
+- Parallel execution markers
 
 #### `specforge analyze [spec-id]`
 
-Run cross-artifact consistency checks across spec, plan, tasks, and constitution.
+Run cross-artifact consistency checks across spec, plan, tasks, constitution, and `.spec.yaml` models.
 
 ```bash
 specforge analyze 001-user-authentication    # Analyze one spec
 specforge analyze                            # Analyze all specs
 ```
 
-Reports findings by severity (CRITICAL, HIGH, MEDIUM, LOW) and writes `analysis-report.md`. Exits with code 1 if critical issues found.
+Reports findings by severity:
+- **CRITICAL** — Constitution compliance violations
+- **HIGH** — Coverage gaps
+- **MEDIUM** — Missing tests
+- **LOW** — Naming issues, entity mismatches
+
+Writes `analysis-report.md`. Exits with code 1 if critical issues found.
 
 ### Code Generation
+
+#### `specforge validate [spec-path]`
+
+Validate `.spec.yaml` files against the schema. Shows model, endpoint, and test counts.
+
+```bash
+specforge validate
+specforge validate spec/app.spec.yaml
+```
 
 #### `specforge generate [options]`
 
@@ -259,6 +347,8 @@ specforge diff
 specforge diff -v              # Verbose line-level diffs
 specforge diff -p model prisma
 ```
+
+Shows `[ADD]`, `[MOD]`, and unchanged file counts with optional line-level diffs.
 
 #### `specforge test`
 
@@ -305,9 +395,9 @@ Also available as a generator plugin: `specforge generate -p playwright`
 Run Playwright E2E tests against all SpecForge CLI commands.
 
 ```bash
-specforge test-e2e                        # Run all 51 tests
+specforge test-e2e                        # Run all tests
 specforge test-e2e --command brainstorm   # Test a specific command
-specforge test-e2e --suite pipeline       # Run the 10-step pipeline test
+specforge test-e2e --suite pipeline       # Run the full pipeline test
 specforge test-e2e --suite errors         # Run error handling tests
 specforge test-e2e --workers 1            # Single worker (sequential)
 ```
@@ -320,13 +410,13 @@ specforge test-e2e --workers 1            # Single worker (sequential)
 | `--suite <name>` | Run a test suite: `pipeline`, `errors`, or a command name |
 | `--workers <n>` | Number of parallel workers |
 
-Tests run in temporary directories, validate stdout/stderr, exit codes, and generated file contents. The pipeline suite runs all 10 steps sequentially to verify the full workflow.
+Tests run in temporary directories, validate stdout/stderr, exit codes, and generated file contents. The pipeline suite runs all steps sequentially to verify the full workflow.
 
 ### Pipeline & Integration
 
 #### `specforge implement <spec-id> [options]`
 
-Run the full implementation pipeline in one command: clarify → plan → tasks → analyze → generate.
+Run the full implementation pipeline in one command.
 
 ```bash
 specforge implement 001-user-authentication
@@ -334,7 +424,24 @@ specforge implement 001-user-authentication --skip-generate
 specforge implement 001-user-authentication -p model prisma fastify
 ```
 
-Skips steps that have already been completed (checks for existing artifacts). Updates spec status to `in-progress`.
+**Pipeline steps** (auto-skips if artifacts already exist):
+
+1. **Clarify** — Scan for ambiguities (skipped if `clarification-log.md` exists)
+2. **Plan** — Generate implementation plan (skipped if `plan.md` exists)
+3. **Tasks** — Generate task list (skipped if `tasks.md` exists)
+4. **Analyze** — Cross-artifact consistency check (always runs)
+5. **Validate** — Check `.spec.yaml` (unless `--skip-generate`)
+6. **Generate** — Generate code via plugins (unless `--skip-generate`)
+7. **Status Update** — Updates spec status to `in-progress`
+
+Shows a full implementation summary with task execution order, file changes, dependency graph, and next steps.
+
+**Options:**
+
+| Option | Description |
+|--------|-------------|
+| `--skip-generate` | Skip code generation step |
+| `-p, --plugins <plugins...>` | Plugins to use for generation |
 
 #### `specforge issues <spec-id> [options]`
 
@@ -349,7 +456,7 @@ Each issue includes task ID, priority, phase, scenario reference, and dependenci
 
 #### `specforge watch [options]`
 
-Watch spec files and auto-validate on changes.
+Watch spec files and auto-validate on changes. Watches `spec/` and `specs/` directories with debounced validation.
 
 ```bash
 specforge watch
@@ -390,6 +497,57 @@ specforge remove             # Preview what will be removed
 specforge remove --force     # Remove without confirmation
 ```
 
+Removes: `spec/`, `specs/`, `memory/`, `CLAUDE.md`, `.claude/commands/specforge-*.md`, `.specforge/`
+
+### Custom Commands
+
+#### `specforge command add <name>`
+
+Register a custom command shortcut with variable support.
+
+```bash
+specforge command add deploy --run "git push {remote} {branch}" --description "Push to remote"
+specforge command add lint --run "eslint src/" --alias l
+```
+
+Variables use `{name}` syntax and are substituted from positional args or `--name` flags when the command is run.
+
+#### `specforge command list`
+
+List all registered custom commands with aliases and descriptions.
+
+```bash
+specforge command list
+```
+
+#### `specforge command edit <name>`
+
+Update an existing custom command.
+
+```bash
+specforge command edit deploy --run "git push {remote} {branch} --force"
+specforge command edit deploy --description "Force push to remote"
+specforge command edit deploy --alias d
+```
+
+#### `specforge command remove <name>`
+
+Remove a custom command.
+
+```bash
+specforge command remove deploy
+```
+
+#### `specforge command show <name>`
+
+Show details of a custom command including its run string, alias, description, and variables.
+
+```bash
+specforge command show deploy
+```
+
+Custom commands are stored in `.specforge/custom-commands.yaml`. Built-in commands are protected and cannot be overridden.
+
 ## Generator Plugins
 
 | Plugin | Output | Description |
@@ -401,6 +559,34 @@ specforge remove --force     # Remove without confirmation
 | **docs** | `docs/` | OpenAPI 3.0 spec, Mermaid ER diagrams, API README |
 | **middleware** | `src/middleware/*.ts` | JWT auth, request validation, error handler |
 | **playwright** | `tests/e2e/` | Playwright MCP E2E tests, data factories, auth setup |
+
+## Claude Code Integration
+
+SpecForge includes first-class Claude Code integration. Running `specforge init` creates:
+
+- **`CLAUDE.md`** — Project instructions with the full SpecForge workflow, managed between `<!-- specforge:start -->` / `<!-- specforge:end -->` markers
+- **16 slash commands** in `.claude/commands/` for Claude Code:
+
+| Slash Command | Purpose |
+|---------------|---------|
+| `/specforge-init` | Initialize SpecForge in current project |
+| `/specforge-constitution` | Create or view the project constitution |
+| `/specforge-specify` | Create a new feature spec |
+| `/specforge-clarify` | Scan spec for ambiguities |
+| `/specforge-review` | Score spec quality |
+| `/specforge-plan` | Generate implementation plan |
+| `/specforge-brainstorm` | Research competitors and suggest features |
+| `/specforge-tasks` | Generate task list |
+| `/specforge-analyze` | Run consistency analysis |
+| `/specforge-generate` | Generate code from spec |
+| `/specforge-diff` | Preview code generation changes |
+| `/specforge-implement` | Run full pipeline |
+| `/specforge-pipeline` | Interactive step-by-step workflow |
+| `/specforge-command` | Manage custom commands |
+| `/specforge-update` | Sync integration files after CLI upgrade |
+| `/specforge-test-pw` | Generate Playwright E2E tests |
+
+Run `specforge update` after upgrading the CLI to sync these files with the latest version.
 
 ## Spec File Format
 
@@ -501,21 +687,41 @@ After initialization, your project looks like:
 ```
 my-app/
 ├── specforge.config.yaml
+├── CLAUDE.md                      # Claude Code integration (managed by SpecForge)
+├── .claude/
+│   └── commands/
+│       └── specforge-*.md         # 16 slash commands for Claude Code
+├── .specforge/
+│   ├── version.yaml               # CLI version tracking
+│   └── custom-commands.yaml       # Custom command definitions
 ├── spec/
-│   └── app.spec.yaml          # API spec for code generation
+│   └── app.spec.yaml              # API spec for code generation
 ├── memory/
-│   └── constitution.md        # Project constitution
+│   └── constitution.md            # Project constitution (9 articles + project context)
 ├── specs/
 │   └── 001-user-auth/
-│       ├── spec.md              # Feature specification
-│       ├── clarification-log.md # Ambiguity scan results
-│       ├── implementation.md    # Implementation notes (entity map, recommendations)
-│       ├── plan.md              # Implementation plan
-│       ├── data-model.md        # ER diagram and entity details
-│       ├── brainstorm-report.md # Competitor analysis and suggestions
-│       ├── tasks.md             # Prioritized task list
-│       └── analysis-report.md   # Consistency check report
-└── CLAUDE.md                    # Claude Code integration
+│       ├── spec.md                # Feature specification
+│       ├── clarification-log.md   # Ambiguity scan results
+│       ├── implementation.md      # Implementation notes (entity map, recommendations)
+│       ├── review-report.md       # Spec quality score (5 dimensions)
+│       ├── plan.md                # Implementation plan
+│       ├── data-model.md          # ER diagram and entity details
+│       ├── brainstorm-report.md   # Competitor analysis and suggestions
+│       ├── tasks.md               # Prioritized task list
+│       └── analysis-report.md     # Consistency check report
+├── src/                           # Generated source code
+│   ├── models/                    # TypeScript interfaces (model plugin)
+│   ├── routes/                    # Fastify routes (fastify plugin)
+│   └── middleware/                # Auth, validation, error handler (middleware plugin)
+├── prisma/
+│   └── schema.prisma              # Generated Prisma schema
+├── tests/
+│   ├── *.test.ts                  # Generated Vitest tests
+│   └── e2e/                       # Generated Playwright E2E tests
+└── docs/
+    ├── openapi.json               # Generated OpenAPI 3.0 spec
+    ├── er-diagram.md              # Generated Mermaid ER diagram
+    └── API.md                     # Generated API documentation
 ```
 
 ## Monorepo Structure
@@ -524,9 +730,9 @@ SpecForge is built as a pnpm monorepo with 4 packages:
 
 ```
 packages/
-├── core/              — Types, parsing, validation, planning, brainstorm analysis
-├── cli/               — Commander.js CLI with 19 commands
-├── generator/         — Handlebars-based code generation with 6 plugins
+├── core/              — Types, parsing, validation, planning, brainstorm, review, project analysis
+├── cli/               — Commander.js CLI with 20 commands + 5 subcommands
+├── generator/         — Handlebars-based code generation with 7 plugins
 └── create-specforge/  — Project scaffolding (npx create-specforge)
 ```
 
