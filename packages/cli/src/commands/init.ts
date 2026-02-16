@@ -178,7 +178,7 @@ Creates \`specs/NNN-feature-name/spec.md\`. Edit this file to define:
 \`\`\`bash
 specforge clarify <spec-id>
 \`\`\`
-Scans the spec for 10 categories of ambiguity. Fix findings before proceeding.
+Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Fix findings before proceeding.
 
 ### 4. Review Spec Quality
 \`\`\`bash
@@ -294,7 +294,13 @@ If $ARGUMENTS is provided, use it as the spec-id. Otherwise, list available spec
 
 Run: \`specforge clarify <spec-id>\`
 
-This scans across 10 ambiguity categories: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth, missing error handling, incomplete data model, ambiguous terminology.
+This scans across 15 ambiguity categories:
+- **Text-level (10):** placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth, missing error handling, incomplete data model, ambiguous terminology.
+- **Entity relationships:** detects implicit relationships from scenario co-occurrences and verb patterns (adds X to Y, belongs to, contains, has).
+- **Open question suggestions:** checks if open questions may be answerable from existing spec content.
+- **Cross-spec alignment:** compares Key Entities vs .spec.yaml models for mismatches.
+- **Scenario-entity coverage:** ensures every entity appears in at least one scenario.
+- **Implicit entity detection:** finds PascalCase words and article+Capitalized patterns in scenarios not listed in Key Entities.
 
 After showing findings, help the user fix the ambiguities by editing the spec.md file. Then suggest running \`specforge review\` to score spec quality, or \`specforge plan\` to generate an implementation plan.`,
 

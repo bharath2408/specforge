@@ -1,8 +1,11 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { loadConfig } from "@specforge-dev/core/config";
-import { resolveSpecDir } from "@specforge-dev/core/sequence";
+import { resolveSpecDir, parseSpecDirName } from "@specforge-dev/core/sequence";
 import { scanForAmbiguities, generateCoverageTable } from "@specforge-dev/core/ambiguity";
+import { parseSpecMarkdown } from "@specforge-dev/core/specfile";
+import { discoverSpecFiles, parseSpecFile, validateSpec } from "@specforge-dev/core";
+import type { FeatureSpec, ParsedSpec } from "@specforge-dev/core";
 
 export async function clarifyCommand(specId: string): Promise<void> {
   if (!specId) {
@@ -30,10 +33,34 @@ export async function clarifyCommand(specId: string): Promise<void> {
 
   const content = fs.readFileSync(specPath, "utf-8");
 
+  // Parse spec.md into FeatureSpec
+  let featureSpec: FeatureSpec | undefined;
+  const dirName = path.basename(specDir);
+  const parsed = parseSpecDirName(dirName);
+  if (parsed) {
+    featureSpec = parseSpecMarkdown(content, parsed.seq, parsed.slug);
+  }
+
+  // Try to load .spec.yaml into ParsedSpec
+  let parsedSpec: ParsedSpec | undefined;
+  try {
+    const yamlDir = path.resolve(config.specDir);
+    const specFiles = discoverSpecFiles(yamlDir);
+    if (specFiles.length > 0) {
+      const raw = parseSpecFile(specFiles[0]);
+      const result = validateSpec(raw);
+      if (result.success && result.spec) {
+        parsedSpec = result.spec;
+      }
+    }
+  } catch {
+    // Silently skip — .spec.yaml is optional for clarify
+  }
+
   console.log(`\n  Scanning spec for ambiguities: ${specId}\n`);
 
   // Run ambiguity scan
-  const findings = scanForAmbiguities(content);
+  const findings = scanForAmbiguities(content, featureSpec, parsedSpec);
 
   if (findings.length === 0) {
     console.log("  No ambiguities found! Spec looks well-defined.\n");

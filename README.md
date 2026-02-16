@@ -114,13 +114,13 @@ Creates `specs/001-user-authentication/spec.md` with:
 
 #### `specforge clarify <spec-id>`
 
-Scan a spec for ambiguities across 10 categories and generate clarification questions.
+Scan a spec for ambiguities across 15 categories and generate clarification questions.
 
 ```bash
 specforge clarify 001-user-authentication
 ```
 
-Checks for: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth rules, missing error handling, incomplete data models, and ambiguous terminology.
+Checks for: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth rules, missing error handling, incomplete data models, ambiguous terminology, entity relationships, open question suggestions, cross-spec alignment, scenario-entity coverage, and implicit entity detection.
 
 Outputs a coverage table and writes `clarification-log.md`.
 

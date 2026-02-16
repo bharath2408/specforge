@@ -1,6 +1,12 @@
-import type { AmbiguityFinding, CoverageTable } from "./types.js";
+import type { AmbiguityFinding, CoverageTable, FeatureSpec, ParsedSpec } from "./types.js";
 
-// 10 ambiguity categories
+export interface ScannerContext {
+  content: string;
+  featureSpec?: FeatureSpec;
+  parsedSpec?: ParsedSpec;
+}
+
+// 15 ambiguity categories
 const AMBIGUITY_CATEGORIES = [
   "placeholder-text",
   "empty-sections",
@@ -12,6 +18,11 @@ const AMBIGUITY_CATEGORIES = [
   "missing-error-handling",
   "incomplete-data-model",
   "ambiguous-terminology",
+  "entity-relationships",
+  "open-question-suggestions",
+  "cross-spec-alignment",
+  "scenario-entity-coverage",
+  "implicit-entity-detection",
 ] as const;
 
 type AmbiguityCategory = (typeof AMBIGUITY_CATEGORIES)[number];
@@ -19,7 +30,7 @@ type AmbiguityCategory = (typeof AMBIGUITY_CATEGORIES)[number];
 interface Scanner {
   category: AmbiguityCategory;
   label: string;
-  scan: (content: string) => AmbiguityFinding[];
+  scan: (ctx: ScannerContext) => AmbiguityFinding[];
 }
 
 const PLACEHOLDER_PATTERNS = [
@@ -37,7 +48,7 @@ const scanners: Scanner[] = [
   {
     category: "placeholder-text",
     label: "Placeholder Text",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const lines = content.split("\n");
       for (let i = 0; i < lines.length; i++) {
@@ -60,7 +71,7 @@ const scanners: Scanner[] = [
   {
     category: "empty-sections",
     label: "Empty Sections",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const sections = content.split(/^## /m);
       for (const section of sections.slice(1)) {
@@ -86,7 +97,7 @@ const scanners: Scanner[] = [
   {
     category: "missing-priorities",
     label: "Missing Priorities",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const scenarioMatches = content.match(/^### \[US\d+\]/gm);
       if (scenarioMatches) {
@@ -116,7 +127,7 @@ const scanners: Scanner[] = [
   {
     category: "undefined-entities",
     label: "Undefined Entities",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const entitySection = content.match(
         /## Key Entities\n([\s\S]*?)(?=\n## |$)/
@@ -146,7 +157,7 @@ const scanners: Scanner[] = [
   {
     category: "unclear-acceptance-criteria",
     label: "Unclear Acceptance Criteria",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const successSection = content.match(
         /## Success Criteria\n([\s\S]*?)(?=\n## |$)/
@@ -198,7 +209,7 @@ const scanners: Scanner[] = [
   {
     category: "missing-edge-cases",
     label: "Missing Edge Cases",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const edgeCaseSection = content.match(
         /## Edge Cases\n([\s\S]*?)(?=\n## |$)/
@@ -229,7 +240,7 @@ const scanners: Scanner[] = [
   {
     category: "undefined-auth",
     label: "Undefined Authentication",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const hasAuth =
         /auth/i.test(content) ||
@@ -259,7 +270,7 @@ const scanners: Scanner[] = [
   {
     category: "missing-error-handling",
     label: "Missing Error Handling",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const hasError =
         /error/i.test(content) || /fail/i.test(content);
@@ -284,7 +295,7 @@ const scanners: Scanner[] = [
   {
     category: "incomplete-data-model",
     label: "Incomplete Data Model",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const entitySection = content.match(
         /## Key Entities\n([\s\S]*?)(?=\n## |$)/
@@ -313,7 +324,7 @@ const scanners: Scanner[] = [
   {
     category: "ambiguous-terminology",
     label: "Ambiguous Terminology",
-    scan(content) {
+    scan({ content }) {
       const findings: AmbiguityFinding[] = [];
       const ambiguousTerms = [
         { term: /\bthe system\b/gi, suggestion: "Specify which component or service." },
@@ -343,16 +354,253 @@ const scanners: Scanner[] = [
       return findings;
     },
   },
+  // ── New enhanced scanners (11–15) ──────────────────────────
+  {
+    category: "entity-relationships",
+    label: "Entity Relationships",
+    scan({ featureSpec }) {
+      if (!featureSpec) return [];
+      const findings: AmbiguityFinding[] = [];
+      const entities = featureSpec.entities;
+      if (entities.length < 2) return findings;
+
+      const scenarioTexts = featureSpec.scenarios.map(
+        (s) => `${s.given} ${s.when} ${s.then}`
+      );
+
+      const reported = new Set<string>();
+
+      // Co-occurrence: both entity names in same scenario
+      for (let i = 0; i < entities.length; i++) {
+        for (let j = i + 1; j < entities.length; j++) {
+          const a = entities[i];
+          const b = entities[j];
+          const key = [a, b].sort().join("|");
+          if (reported.has(key)) continue;
+
+          for (const text of scenarioTexts) {
+            const lower = text.toLowerCase();
+            if (lower.includes(a.toLowerCase()) && lower.includes(b.toLowerCase())) {
+              reported.add(key);
+              findings.push({
+                category: "entity-relationships",
+                description: `"${a}" and "${b}" appear together in a scenario, suggesting a relationship.`,
+                location: "User Scenarios",
+                suggestion: `Define the relationship between "${a}" and "${b}" in the data model (e.g., one-to-many, many-to-many).`,
+              });
+              break;
+            }
+          }
+        }
+      }
+
+      // Verb patterns: "adds X to Y", "belongs to", "contains", "has"
+      const verbPatterns = [
+        /(\w+)\s+adds\s+(\w+)\s+to\s+(\w+)/gi,
+        /(\w+)\s+creates?\s+(?:a\s+)?(\w+)/gi,
+        /(\w+)\s+belongs?\s+to\s+(\w+)/gi,
+        /(\w+)\s+contains?\s+(\w+)/gi,
+        /(\w+)\s+has\s+(?:a\s+|an\s+)?(\w+)/gi,
+      ];
+
+      const allScenarioText = scenarioTexts.join(" ");
+      const entityNamesLower = new Set(entities.map((e) => e.toLowerCase()));
+
+      for (const pattern of verbPatterns) {
+        pattern.lastIndex = 0;
+        let match: RegExpExecArray | null;
+        while ((match = pattern.exec(allScenarioText)) !== null) {
+          const words = match.slice(1).filter((w) => entityNamesLower.has(w.toLowerCase()));
+          if (words.length >= 2) {
+            const key = words.map((w) => w.toLowerCase()).sort().join("|");
+            if (!reported.has(key)) {
+              reported.add(key);
+              findings.push({
+                category: "entity-relationships",
+                description: `Verb pattern "${match[0].trim()}" implies a relationship between entities.`,
+                location: "User Scenarios",
+                suggestion: `Model the relationship suggested by "${match[0].trim()}" in Key Entities or data model.`,
+              });
+            }
+          }
+        }
+      }
+
+      return findings;
+    },
+  },
+  {
+    category: "open-question-suggestions",
+    label: "Open Question Suggestions",
+    scan({ featureSpec }) {
+      if (!featureSpec) return [];
+      const findings: AmbiguityFinding[] = [];
+      if (featureSpec.openQuestions.length === 0) return findings;
+
+      // Build searchable text from scenarios, requirements, criteria
+      const searchable = [
+        ...featureSpec.scenarios.map((s) => `${s.description} ${s.given} ${s.when} ${s.then}`),
+        ...featureSpec.requirements.map((r) => r.description),
+        ...featureSpec.successCriteria,
+        ...featureSpec.edgeCases,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      for (const question of featureSpec.openQuestions) {
+        // Extract significant keywords (length > 4, not common words)
+        const stopWords = new Set(["about", "should", "would", "could", "there", "their", "which", "where", "these", "those", "being", "after", "before"]);
+        const keywords = question
+          .replace(/[?.,!;:'"]/g, "")
+          .split(/\s+/)
+          .filter((w) => w.length > 4 && !stopWords.has(w.toLowerCase()))
+          .map((w) => w.toLowerCase());
+
+        const matchCount = keywords.filter((kw) => searchable.includes(kw)).length;
+
+        if (matchCount >= 2) {
+          findings.push({
+            category: "open-question-suggestions",
+            description: `Open question "${question}" has related context in the spec (${matchCount} keyword matches).`,
+            location: "Open Questions",
+            suggestion: "Review scenarios and requirements — this question may be answerable from existing spec content.",
+          });
+        }
+      }
+
+      return findings;
+    },
+  },
+  {
+    category: "cross-spec-alignment",
+    label: "Cross-Spec Alignment",
+    scan({ featureSpec, parsedSpec }) {
+      if (!featureSpec || !parsedSpec) return [];
+      const findings: AmbiguityFinding[] = [];
+
+      const specEntities = new Set(featureSpec.entities.map((e) => e.toLowerCase()));
+      const yamlModels = new Set(Object.keys(parsedSpec.models).map((m) => m.toLowerCase()));
+
+      // Entities in spec.md but missing from .spec.yaml
+      for (const entity of featureSpec.entities) {
+        if (!yamlModels.has(entity.toLowerCase())) {
+          findings.push({
+            category: "cross-spec-alignment",
+            description: `Entity "${entity}" is in spec.md but missing from .spec.yaml models.`,
+            location: "Key Entities vs .spec.yaml",
+            suggestion: `Add a "${entity}" model to .spec.yaml or remove it from Key Entities if not needed.`,
+          });
+        }
+      }
+
+      // Models in .spec.yaml but missing from spec.md
+      for (const model of Object.keys(parsedSpec.models)) {
+        if (!specEntities.has(model.toLowerCase())) {
+          findings.push({
+            category: "cross-spec-alignment",
+            description: `Model "${model}" is in .spec.yaml but missing from spec.md Key Entities.`,
+            location: ".spec.yaml vs Key Entities",
+            suggestion: `Add "${model}" to Key Entities in spec.md or remove it from .spec.yaml if not needed.`,
+          });
+        }
+      }
+
+      return findings;
+    },
+  },
+  {
+    category: "scenario-entity-coverage",
+    label: "Scenario-Entity Coverage",
+    scan({ featureSpec }) {
+      if (!featureSpec) return [];
+      const findings: AmbiguityFinding[] = [];
+      if (featureSpec.entities.length === 0 || featureSpec.scenarios.length === 0) return findings;
+
+      const allScenarioText = featureSpec.scenarios
+        .map((s) => `${s.description} ${s.given} ${s.when} ${s.then}`)
+        .join(" ")
+        .toLowerCase();
+
+      for (const entity of featureSpec.entities) {
+        if (!allScenarioText.includes(entity.toLowerCase())) {
+          findings.push({
+            category: "scenario-entity-coverage",
+            description: `Entity "${entity}" is not mentioned in any user scenario.`,
+            location: "Key Entities",
+            suggestion: `Add a scenario that exercises "${entity}" or remove it from Key Entities if unused.`,
+          });
+        }
+      }
+
+      return findings;
+    },
+  },
+  {
+    category: "implicit-entity-detection",
+    label: "Implicit Entity Detection",
+    scan({ content, featureSpec }) {
+      if (!featureSpec) return [];
+      const findings: AmbiguityFinding[] = [];
+
+      const knownEntities = new Set(featureSpec.entities.map((e) => e.toLowerCase()));
+
+      // Collect scenario and requirement text
+      const textToScan = [
+        ...featureSpec.scenarios.map((s) => `${s.description} ${s.given} ${s.when} ${s.then}`),
+        ...featureSpec.requirements.map((r) => r.description),
+      ].join("\n");
+
+      const found = new Set<string>();
+
+      // PascalCase words (2+ capital-started segments, e.g., UserProfile, ShoppingCart)
+      const pascalCasePattern = /\b([A-Z][a-z]+(?:[A-Z][a-z]+)+)\b/g;
+      let match: RegExpExecArray | null;
+      while ((match = pascalCasePattern.exec(textToScan)) !== null) {
+        const word = match[1];
+        if (!knownEntities.has(word.toLowerCase()) && !found.has(word.toLowerCase())) {
+          found.add(word.toLowerCase());
+          findings.push({
+            category: "implicit-entity-detection",
+            description: `PascalCase word "${word}" found in scenarios/requirements but not in Key Entities.`,
+            location: "User Scenarios / Requirements",
+            suggestion: `Consider adding "${word}" to Key Entities if it's a domain object.`,
+          });
+        }
+      }
+
+      // "the/a/an + Capitalized" patterns (e.g., "the Order", "a Product")
+      const articlePattern = /\b(?:the|a|an)\s+([A-Z][a-z]{2,})\b/g;
+      while ((match = articlePattern.exec(textToScan)) !== null) {
+        const word = match[1];
+        if (!knownEntities.has(word.toLowerCase()) && !found.has(word.toLowerCase())) {
+          found.add(word.toLowerCase());
+          findings.push({
+            category: "implicit-entity-detection",
+            description: `"${match[0]}" in scenarios/requirements suggests an entity not in Key Entities.`,
+            location: "User Scenarios / Requirements",
+            suggestion: `Consider adding "${word}" to Key Entities if it's a domain object.`,
+          });
+        }
+      }
+
+      return findings;
+    },
+  },
 ];
 
 /**
- * Scan spec content for ambiguities across all 10 categories.
+ * Scan spec content for ambiguities across all 15 categories.
  */
-export function scanForAmbiguities(content: string): AmbiguityFinding[] {
+export function scanForAmbiguities(
+  content: string,
+  featureSpec?: FeatureSpec,
+  parsedSpec?: ParsedSpec,
+): AmbiguityFinding[] {
   const findings: AmbiguityFinding[] = [];
+  const ctx: ScannerContext = { content, featureSpec, parsedSpec };
 
   for (const scanner of scanners) {
-    findings.push(...scanner.scan(content));
+    findings.push(...scanner.scan(ctx));
   }
 
   return findings;
