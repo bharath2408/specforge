@@ -8,7 +8,8 @@
     "test": "pnpm -r test",
     "test:e2e": "npx playwright test",
     "test:e2e:pipeline": "npx playwright test --project pipeline",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "version:sync": "node scripts/sync-version.js"
   },
   "keywords": [
     "spec-driven",

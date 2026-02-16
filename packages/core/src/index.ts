@@ -1,3 +1,4 @@
+export { VERSION } from "./version.js";
 export { parseSpecFile, parseSpecString, discoverSpecFiles } from "./parser.js";
 export { validateSpec, validateSpecOrThrow } from "./validator.js";
 export { specSchema } from "./schema.js";

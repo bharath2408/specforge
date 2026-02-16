@@ -1,0 +1,170 @@
+specforge: "1.0"
+name: my-app
+version: "0.1.0"
+
+models:
+  User:
+    fields:
+      id:
+        type: uuid
+        primary: true
+      email:
+        type: string
+        unique: true
+        validate: email
+      name:
+        type: string
+        min: 2
+        max: 100
+      role:
+        type: enum
+        values: [admin, user, moderator]
+        default: user
+      createdAt:
+        type: datetime
+        auto: true
+
+  Post:
+    fields:
+      id:
+        type: uuid
+        primary: true
+      title:
+        type: string
+        min: 1
+        max: 200
+      body:
+        type: text
+      published:
+        type: boolean
+        default: false
+      authorId:
+        type: relation
+        model: User
+        kind: many-to-one
+
+  CustomCommand:
+    fields:
+      id:
+        type: uuid
+        primary: true
+      name:
+        type: string
+        unique: true
+        min: 1
+        max: 100
+        validate: "^[a-zA-Z0-9-]+$"
+      description:
+        type: string
+        optional: true
+        max: 500
+      run:
+        type: text
+      alias:
+        type: string
+        optional: true
+        unique: true
+        max: 50
+      variables:
+        type: json
+        optional: true
+      createdAt:
+        type: datetime
+        auto: true
+      updatedAt:
+        type: datetime
+        auto: true
+
+  CommandVariable:
+    fields:
+      id:
+        type: uuid
+        primary: true
+      name:
+        type: string
+        min: 1
+        max: 50
+      required:
+        type: boolean
+        default: true
+      default:
+        type: string
+        optional: true
+      description:
+        type: string
+        optional: true
+        max: 200
+      commandId:
+        type: relation
+        model: CustomCommand
+        kind: many-to-one
+
+  CommandRegistry:
+    fields:
+      id:
+        type: uuid
+        primary: true
+      commands:
+        type: json
+      configPath:
+        type: string
+        default: ".specforge/commands.yaml"
+      loadedAt:
+        type: datetime
+        auto: true
+
+api:
+  basePath: /api/v1
+  auth:
+    strategy: jwt
+
+  endpoints:
+    - path: /users
+      model: User
+      actions: [list, get, create, update, delete]
+      auth:
+        list: public
+        get: public
+        create: admin
+        update: [admin, owner]
+        delete: admin
+
+    - path: /posts
+      model: Post
+      actions: [list, get, create, update, delete]
+      auth:
+        list: public
+        get: public
+        create: authenticated
+        update: [admin, owner]
+        delete: [admin, owner]
+
+    - path: /commands
+      model: CustomCommand
+      actions: [list, get, create, update, delete]
+      auth:
+        list: authenticated
+        get: authenticated
+        create: authenticated
+        update: [admin, owner]
+        delete: [admin, owner]
+
+tests:
+  User:
+    - name: "should create a user"
+      action: create
+      input:
+        email: "test@example.com"
+        name: "Test User"
+      expect:
+        status: 201
+        body:
+          email: "test@example.com"
+
+    - name: "should reject invalid email"
+      action: create
+      input:
+        email: "not-an-email"
+        name: "Test"
+      expect:
+        status: 400

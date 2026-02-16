@@ -1,11 +1,12 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { loadConfig } from "@specforge-dev/core/config";
-import { resolveSpecDir, parseSpecDirName } from "@specforge-dev/core/sequence";
+import { resolveSpecDir, listSpecDirs, parseSpecDirName } from "@specforge-dev/core/sequence";
 import { scanForAmbiguities, generateCoverageTable } from "@specforge-dev/core/ambiguity";
 import { parseSpecMarkdown } from "@specforge-dev/core/specfile";
+import { generateImplementationNotes, generateImplementationMarkdown } from "@specforge-dev/core/implementation";
 import { discoverSpecFiles, parseSpecFile, validateSpec } from "@specforge-dev/core";
-import type { FeatureSpec, ParsedSpec } from "@specforge-dev/core";
+import type { FeatureSpec, ParsedSpec, ImplementationNotes } from "@specforge-dev/core";
 
 export async function clarifyCommand(specId: string): Promise<void> {
   if (!specId) {
@@ -117,7 +118,99 @@ export async function clarifyCommand(specId: string): Promise<void> {
   const logPath = path.join(specDir, "clarification-log.md");
   const logContent = generateClarificationLog(specId, findings, coverage);
   fs.writeFileSync(logPath, logContent, "utf-8");
-  console.log(`\n  Clarification log saved: ${logPath}\n`);
+  console.log(`\n  Clarification log saved: ${logPath}`);
+
+  // Generate implementation notes
+  const previousNotes = loadPreviousImplementationNotes(specsDir, specDir);
+  const implNotes = generateImplementationNotes(
+    featureSpec ?? { id: specId, name: specId, slug: specId, status: "draft", scenarios: [], requirements: [], entities: [], successCriteria: [], edgeCases: [], openQuestions: [] },
+    findings,
+    parsedSpec,
+    previousNotes,
+  );
+  const implPath = path.join(specDir, "implementation.md");
+  const implContent = generateImplementationMarkdown(implNotes);
+  fs.writeFileSync(implPath, implContent, "utf-8");
+  console.log(`  Implementation notes saved: ${implPath}\n`);
+}
+
+/**
+ * Scan other spec directories for existing implementation.md files
+ * and parse them into lightweight ImplementationNotes for pattern reuse.
+ */
+function loadPreviousImplementationNotes(
+  specsDir: string,
+  currentSpecDir: string,
+): ImplementationNotes[] {
+  const notes: ImplementationNotes[] = [];
+
+  try {
+    const specDirs = listSpecDirs(specsDir);
+    for (const dir of specDirs) {
+      const fullDir = path.join(specsDir, dir);
+      if (fullDir === currentSpecDir) continue;
+
+      const implPath = path.join(fullDir, "implementation.md");
+      if (!fs.existsSync(implPath)) continue;
+
+      const parsed = parseSpecDirName(dir);
+      if (!parsed) continue;
+
+      // Parse the implementation.md to extract recommendations
+      const implContent = fs.readFileSync(implPath, "utf-8");
+      const parsedNotes = parseImplementationMarkdown(implContent, parsed.seq, parsed.slug);
+      if (parsedNotes) {
+        notes.push(parsedNotes);
+      }
+    }
+  } catch {
+    // Silently skip — previous notes are optional
+  }
+
+  return notes;
+}
+
+/**
+ * Lightweight parser to extract recommendations from an existing implementation.md.
+ */
+function parseImplementationMarkdown(
+  content: string,
+  seq: number,
+  slug: string,
+): ImplementationNotes | null {
+  const specId = `${String(seq).padStart(3, "0")}-${slug}`;
+  const recommendations: ImplementationNotes["recommendations"] = [];
+
+  // Extract recommendations from "### High Priority" section
+  const highSection = content.match(
+    /### High Priority\n([\s\S]*?)(?=\n### |## |$)/,
+  );
+  if (highSection) {
+    const lines = highSection[1].split("\n").filter((l) => l.startsWith("- **["));
+    for (const line of lines) {
+      const match = line.match(
+        /- \*\*\[(.+?)\]\*\* (.+?) — (.+)/,
+      );
+      if (match) {
+        recommendations.push({
+          category: match[1],
+          priority: "high",
+          action: match[2],
+          context: match[3],
+        });
+      }
+    }
+  }
+
+  return {
+    specId,
+    generatedAt: "",
+    entityMap: [],
+    recommendations,
+    openQuestions: [],
+    crossReferences: [],
+    reusablePatterns: [],
+  };
 }
 
 function generateClarificationLog(

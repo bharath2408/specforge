@@ -2,7 +2,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import YAML from "yaml";
 import type { FileChangeEntry, UpdateResult } from "@specforge-dev/core";
-import { CLAUDE_MD, SLASH_COMMANDS, CLI_VERSION } from "./init.js";
+import { VERSION } from "@specforge-dev/core";
+import { CLAUDE_MD, SLASH_COMMANDS } from "./init.js";
 
 const MARKER_START = "<!-- specforge:start -->";
 const MARKER_END = "<!-- specforge:end -->";
@@ -135,8 +136,8 @@ export async function updateCommand(opts: {
 
   const oldVersion = readVersionFile(cwd);
 
-  if (oldVersion === CLI_VERSION && !force) {
-    console.log(`Already up to date (v${CLI_VERSION}).`);
+  if (oldVersion === VERSION && !force) {
+    console.log(`Already up to date (v${VERSION}).`);
     return;
   }
 
@@ -147,7 +148,7 @@ export async function updateCommand(opts: {
   const fromLabel =
     oldVersion === "0.0.0" ? "unversioned" : `v${oldVersion}`;
   console.log(
-    `\n  Updating SpecForge integration: ${fromLabel} → v${CLI_VERSION}\n`
+    `\n  Updating SpecForge integration: ${fromLabel} → v${VERSION}\n`
   );
 
   // Sync files
@@ -157,13 +158,13 @@ export async function updateCommand(opts: {
 
   // Write version file
   if (!dryRun) {
-    writeVersionFile(CLI_VERSION, cwd);
+    writeVersionFile(VERSION, cwd);
   }
 
   // Build result
   const result: UpdateResult = {
     fromVersion: oldVersion,
-    toVersion: CLI_VERSION,
+    toVersion: VERSION,
     changes: allChanges,
     dryRun,
   };

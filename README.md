@@ -21,7 +21,7 @@ init → constitution → specify → clarify → review → plan → brainstorm
 | **Setup** | `init` | — | Project scaffold | Create project structure with example spec |
 | **Governance** | `constitution` | — | `constitution.md` | Define 9 guiding principles for the project |
 | **Define** | `specify` | Feature name | `spec.md` | Create structured feature spec with scenarios |
-| **Clarify** | `clarify` | `spec.md` | `clarification-log.md` | Scan for ambiguities and coverage gaps |
+| **Clarify** | `clarify` | `spec.md` | `clarification-log.md`, `implementation.md` | Scan for ambiguities and generate implementation notes |
 | **Review** | `review` | `spec.md` | `review-report.md` | Score spec quality on 5 dimensions (0–100) |
 | **Plan** | `plan` | `spec.md` | `plan.md`, `data-model.md` | Generate implementation plan with phases |
 | **Brainstorm** | `brainstorm` | `spec.md`, `plan.md` | `brainstorm-report.md` | Research competitors and suggest value-add features |
@@ -122,7 +122,9 @@ specforge clarify 001-user-authentication
 
 Checks for: placeholder text, empty sections, missing priorities, undefined entities, unclear acceptance criteria, missing edge cases, undefined auth rules, missing error handling, incomplete data models, ambiguous terminology, entity relationships, open question suggestions, cross-spec alignment, scenario-entity coverage, and implicit entity detection.
 
-Outputs a coverage table and writes `clarification-log.md`.
+Outputs a coverage table and writes two files:
+- `clarification-log.md` — flat log of all findings and coverage table
+- `implementation.md` — structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs .spec.yaml), and reusable patterns from previous specs
 
 ### Planning & Analysis
 
@@ -507,6 +509,7 @@ my-app/
 │   └── 001-user-auth/
 │       ├── spec.md              # Feature specification
 │       ├── clarification-log.md # Ambiguity scan results
+│       ├── implementation.md    # Implementation notes (entity map, recommendations)
 │       ├── plan.md              # Implementation plan
 │       ├── data-model.md        # ER diagram and entity details
 │       ├── brainstorm-report.md # Competitor analysis and suggestions

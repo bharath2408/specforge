@@ -30,7 +30,7 @@ Creates `specs/NNN-feature-name/spec.md`. Edit this file to define:
 ```bash
 specforge clarify <spec-id>
 ```
-Scans the spec for 10 categories of ambiguity. Fix findings before proceeding.
+Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Generates `clarification-log.md` and `implementation.md` (entity map, prioritized recommendations, open question context, cross-references, and reusable patterns from previous specs). Fix findings before proceeding.
 
 ### 4. Review Spec Quality
 ```bash
@@ -106,7 +106,7 @@ Runs Playwright E2E tests against all CLI commands. Use `--command <name>` to te
 ## Project Structure
 ```
 spec/app.spec.yaml          # API spec (models, endpoints, tests)
-specs/NNN-feature/           # Feature specs, plans, tasks
+specs/NNN-feature/           # Feature specs, plans, tasks, implementation notes
 memory/constitution.md       # Project principles
 docs/                        # Generated API docs + OpenAPI + ER diagram
 ```

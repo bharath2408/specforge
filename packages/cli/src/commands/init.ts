@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import YAML from "yaml";
+import { VERSION } from "@specforge-dev/core";
 
 const EXAMPLE_SPEC = `specforge: "1.0"
 name: my-app
@@ -145,7 +146,7 @@ const TSCONFIG_TEMPLATE = JSON.stringify(
 // Claude Code Integration — CLAUDE.md + Slash Commands
 // ──────────────────────────────────────────────────────────────
 
-export const CLI_VERSION = "1.0.7";
+export const CLI_VERSION = VERSION;
 
 export const CLAUDE_MD = `# SpecForge — Spec-Driven Development Workflow
 

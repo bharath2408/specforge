@@ -28,7 +28,7 @@ import {
   commandRemoveHandler,
   commandShowHandler,
 } from "./commands/command.js";
-import { isBuiltInCommand, getCustomCommand } from "@specforge-dev/core";
+import { isBuiltInCommand, getCustomCommand, VERSION } from "@specforge-dev/core";
 import { executeCustomCommand } from "./custom-command-runner.js";
 
 const program = new Command();
@@ -36,7 +36,7 @@ const program = new Command();
 program
   .name("specforge")
   .description("SpecForge — Spec-Driven Development Kit")
-  .version("1.0.7");
+  .version(VERSION);
 
 program
   .command("init [project-name]")

@@ -198,10 +198,14 @@ export async function implementCommand(
   console.log(`\n  ${"=".repeat(50)}`);
   console.log(`  Implementation started for: ${dirName}`);
   console.log(`  ${pendingTasks.length} tasks to complete.`);
+  const implPath = path.join(specDir, "implementation.md");
   console.log(`\n  Artifacts:`);
   console.log(`    Spec:     ${specPath}`);
   console.log(`    Plan:     ${planPath}`);
   console.log(`    Tasks:    ${tasksPath}`);
+  if (fs.existsSync(implPath)) {
+    console.log(`    Impl:     ${implPath}`);
+  }
   console.log(`\n  Follow the task list in tasks.md to implement each item.\n`);
 }
 
