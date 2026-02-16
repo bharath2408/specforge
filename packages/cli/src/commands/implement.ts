@@ -59,10 +59,15 @@ export async function implementCommand(
   // ── Step 1: Check prerequisites and run missing steps ──
   let step = 1;
 
-  // Clarification log
+  // Clarification log + implementation notes
   const clarifyPath = path.join(specDir, "clarification-log.md");
+  const implNotesPath = path.join(specDir, "implementation.md");
   if (!fs.existsSync(clarifyPath)) {
     console.log(`  [${step}] Running clarify (no clarification log found)...\n`);
+    await clarifyCommand(dirName);
+    console.log();
+  } else if (!fs.existsSync(implNotesPath)) {
+    console.log(`  [${step}] Re-running clarify (implementation.md missing)...\n`);
     await clarifyCommand(dirName);
     console.log();
   } else {

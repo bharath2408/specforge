@@ -150,17 +150,28 @@ function loadPreviousImplementationNotes(
       const fullDir = path.join(specsDir, dir);
       if (fullDir === currentSpecDir) continue;
 
-      const implPath = path.join(fullDir, "implementation.md");
-      if (!fs.existsSync(implPath)) continue;
-
       const parsed = parseSpecDirName(dir);
       if (!parsed) continue;
 
-      // Parse the implementation.md to extract recommendations
-      const implContent = fs.readFileSync(implPath, "utf-8");
-      const parsedNotes = parseImplementationMarkdown(implContent, parsed.seq, parsed.slug);
-      if (parsedNotes) {
-        notes.push(parsedNotes);
+      const implPath = path.join(fullDir, "implementation.md");
+      if (fs.existsSync(implPath)) {
+        // Parse existing implementation.md
+        const implContent = fs.readFileSync(implPath, "utf-8");
+        const parsedNotes = parseImplementationMarkdown(implContent, parsed.seq, parsed.slug);
+        if (parsedNotes) {
+          notes.push(parsedNotes);
+        }
+        continue;
+      }
+
+      // Fallback: if clarification-log.md exists but implementation.md doesn't,
+      // backfill implementation.md from the clarification findings
+      const clarifyPath = path.join(fullDir, "clarification-log.md");
+      if (!fs.existsSync(clarifyPath)) continue;
+
+      const backfilled = backfillImplementationNotes(fullDir, parsed.seq, parsed.slug);
+      if (backfilled) {
+        notes.push(backfilled);
       }
     }
   } catch {
@@ -168,6 +179,41 @@ function loadPreviousImplementationNotes(
   }
 
   return notes;
+}
+
+/**
+ * Generate implementation.md for a spec that only has clarification-log.md.
+ * Re-runs the generation pipeline and writes the file so future calls skip this.
+ */
+function backfillImplementationNotes(
+  specDir: string,
+  seq: number,
+  slug: string,
+): ImplementationNotes | null {
+  try {
+    const specPath = path.join(specDir, "spec.md");
+    if (!fs.existsSync(specPath)) return null;
+
+    const content = fs.readFileSync(specPath, "utf-8");
+    const featureSpec = parseSpecMarkdown(content, seq, slug);
+    const findings = scanForAmbiguities(content, featureSpec);
+
+    const implNotes = generateImplementationNotes(
+      featureSpec,
+      findings,
+      undefined, // no parsedSpec needed for backfill
+      [],        // no previous notes to avoid recursion
+    );
+
+    // Write the backfilled file so this only happens once
+    const implPath = path.join(specDir, "implementation.md");
+    const implContent = generateImplementationMarkdown(implNotes);
+    fs.writeFileSync(implPath, implContent, "utf-8");
+
+    return implNotes;
+  } catch {
+    return null;
+  }
 }
 
 /**
