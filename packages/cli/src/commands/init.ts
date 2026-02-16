@@ -145,7 +145,7 @@ const TSCONFIG_TEMPLATE = JSON.stringify(
 // Claude Code Integration — CLAUDE.md + Slash Commands
 // ──────────────────────────────────────────────────────────────
 
-export const CLI_VERSION = "1.0.4";
+export const CLI_VERSION = "1.0.7";
 
 export const CLAUDE_MD = `# SpecForge — Spec-Driven Development Workflow
 
