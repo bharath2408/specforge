@@ -96,10 +96,12 @@ program
   .description("Create or amend the project constitution")
   .option("--amend <description>", "Add an amendment")
   .option("--article <id>", "Article ID affected by amendment")
+  .option("--skip-analysis", "Skip project analysis and create constitution without Project Context")
   .action(async (opts) => {
     await constitutionCommand({
       amend: opts.amend,
       article: opts.article,
+      skipAnalysis: opts.skipAnalysis,
     });
   });
 

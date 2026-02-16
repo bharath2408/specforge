@@ -75,6 +75,25 @@ export {
 // Phase 6: Review
 export { reviewSpec, generateReviewMarkdown } from "./reviewer.js";
 
+// Phase 7: Implementation Notes
+export {
+  generateImplementationNotes,
+  generateImplementationMarkdown,
+} from "./implementation.js";
+
+// Phase 8: Project Analysis
+export {
+  analyzeProject,
+  detectFrameworks,
+  classifyProjectType,
+  detectPackageManager,
+  scanDirectoryStructure,
+  generateBestPractices,
+  mapArchitectureFlow,
+  buildManualProjectAnalysis,
+  generateProjectContextMarkdown,
+} from "./project-analyzer.js";
+
 // Phase 5: Custom Commands
 export {
   loadCustomCommands,
@@ -150,4 +169,19 @@ export type {
   ReviewVerdict,
   ReviewReport,
   ReviewOptions,
+  EntityRelationship,
+  EntityMapEntry,
+  OpenQuestionContext,
+  CrossReferenceNote,
+  ImplementationRecommendation,
+  ReusablePattern,
+  ImplementationNotes,
+  ProjectType,
+  DetectedFramework,
+  TechStack,
+  BestPractice,
+  ProjectFlowStep,
+  ProjectFlow,
+  ProjectAnalysis,
+  ManualProjectInput,
 } from "./types.js";

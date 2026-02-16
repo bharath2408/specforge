@@ -163,7 +163,7 @@ Follow this order when implementing features:
 \`\`\`bash
 specforge constitution
 \`\`\`
-Creates \`memory/constitution.md\` with 9 guiding principles. Always check the constitution before making architectural decisions.
+Creates \`memory/constitution.md\` with 9 guiding principles and auto-detected project context (tech stack, architecture, best practices). Use \`--skip-analysis\` to skip project analysis. Always check the constitution before making architectural decisions.
 
 ### 2. Define Feature Spec
 \`\`\`bash
@@ -178,7 +178,7 @@ Creates \`specs/NNN-feature-name/spec.md\`. Edit this file to define:
 \`\`\`bash
 specforge clarify <spec-id>
 \`\`\`
-Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Fix findings before proceeding.
+Scans the spec for 15 categories of ambiguity including entity relationships, cross-spec alignment, and implicit entity detection. Generates \`clarification-log.md\` and \`implementation.md\` (entity map, prioritized recommendations, open question context, cross-references, and reusable patterns from previous specs). Fix findings before proceeding.
 
 ### 4. Review Spec Quality
 \`\`\`bash
@@ -254,7 +254,7 @@ Runs Playwright E2E tests against all CLI commands. Use \`--command <name>\` to 
 ## Project Structure
 \`\`\`
 spec/app.spec.yaml          # API spec (models, endpoints, tests)
-specs/NNN-feature/           # Feature specs, plans, tasks
+specs/NNN-feature/           # Feature specs, plans, tasks, implementation notes
 memory/constitution.md       # Project principles
 docs/                        # Generated API docs + OpenAPI + ER diagram
 \`\`\`
@@ -274,6 +274,8 @@ After init, show the user what was created and suggest next steps:
 
 Run \`specforge constitution\` in the current project directory. This creates \`memory/constitution.md\` with 9 guiding articles:
 Library-First, CLI Mandate, Test-First, Simplicity, Anti-Abstraction, Documentation as Code, Backward Compatibility, Single Responsibility, Spec-Driven Development.
+
+Auto-analysis: If a package.json exists, the command auto-detects the project's tech stack (frameworks, ORM, testing, bundler, CSS), classifies the project type (frontend/backend/fullstack/library/CLI/monorepo), and generates a "Project Context" section with architecture flow and best practices. For new projects without package.json, interactive prompts ask for project details. Use \`--skip-analysis\` to skip.
 
 If the constitution already exists, show its contents. If the user wants to add an amendment, run:
 \`specforge constitution --amend "description" --article <article-id>\``,
@@ -301,6 +303,10 @@ This scans across 15 ambiguity categories:
 - **Cross-spec alignment:** compares Key Entities vs .spec.yaml models for mismatches.
 - **Scenario-entity coverage:** ensures every entity appears in at least one scenario.
 - **Implicit entity detection:** finds PascalCase words and article+Capitalized patterns in scenarios not listed in Key Entities.
+
+Outputs two files:
+- \`clarification-log.md\` — flat log of all findings and coverage table
+- \`implementation.md\` — structured implementation notes with entity map, prioritized recommendations, open question context, cross-references (spec vs .spec.yaml), and reusable patterns from previous specs
 
 After showing findings, help the user fix the ambiguities by editing the spec.md file. Then suggest running \`specforge review\` to score spec quality, or \`specforge plan\` to generate an implementation plan.`,
 
@@ -577,9 +583,12 @@ export async function initCommand(projectName?: string): Promise<void> {
     console.log(`\nDone! SpecForge initialized in your project.\n`);
     console.log(`  Next steps:\n`);
     console.log(`  specforge validate            # validate the spec`);
-    console.log(`  specforge constitution         # define project principles`);
+    console.log(`  specforge constitution         # define project principles + auto-detect tech stack`);
     console.log(`  specforge generate             # generate code from spec`);
     console.log(`  specforge specify <feature>    # create a feature spec`);
+    console.log();
+    console.log(`  Tip: 'specforge constitution' will auto-analyze your project's tech stack,`);
+    console.log(`  frameworks, and generate tailored best practices in the constitution.`);
     console.log();
     console.log(`  Claude Code slash commands available:`);
     console.log(`    /specforge-pipeline <feature>  # run full workflow`);

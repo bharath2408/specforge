@@ -60,6 +60,14 @@
     "./tool-selector": {
       "types": "./dist/tool-selector.d.ts",
       "default": "./dist/tool-selector.js"
+    },
+    "./implementation": {
+      "types": "./dist/implementation.d.ts",
+      "default": "./dist/implementation.js"
+    },
+    "./project-analyzer": {
+      "types": "./dist/project-analyzer.d.ts",
+      "default": "./dist/project-analyzer.js"
     }
   },
   "scripts": {

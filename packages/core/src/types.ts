@@ -280,6 +280,61 @@ export interface CoverageTable {
 }
 
 // ──────────────────────────────────────────────────────────────
+// Implementation Notes
+// ──────────────────────────────────────────────────────────────
+
+export interface EntityRelationship {
+  entityA: string;
+  entityB: string;
+  type: "co-occurrence" | "verb-pattern";
+  evidence: string;
+}
+
+export interface EntityMapEntry {
+  name: string;
+  relationships: EntityRelationship[];
+  mentionedInScenarios: boolean;
+  definedInYaml: boolean;
+  implicitlyDetected: boolean;
+}
+
+export interface OpenQuestionContext {
+  question: string;
+  relatedKeywords: string[];
+  specContextSnippets: string[];
+  suggestedAnswer: string;
+}
+
+export interface CrossReferenceNote {
+  type: "missing-in-yaml" | "missing-in-spec" | "alignment-ok";
+  entity: string;
+  details: string;
+}
+
+export interface ImplementationRecommendation {
+  category: string;
+  priority: "high" | "medium" | "low";
+  action: string;
+  context: string;
+}
+
+export interface ReusablePattern {
+  specId: string;
+  pattern: string;
+  category: string;
+}
+
+export interface ImplementationNotes {
+  specId: string;
+  generatedAt: string;
+  entityMap: EntityMapEntry[];
+  recommendations: ImplementationRecommendation[];
+  openQuestions: OpenQuestionContext[];
+  crossReferences: CrossReferenceNote[];
+  reusablePatterns: ReusablePattern[];
+}
+
+// ──────────────────────────────────────────────────────────────
 // Brainstorm
 // ──────────────────────────────────────────────────────────────
 
@@ -432,4 +487,83 @@ export interface UpdateResult {
   toVersion: string;
   changes: FileChangeEntry[];
   dryRun: boolean;
+}
+
+// ──────────────────────────────────────────────────────────────
+// Project Analysis
+// ──────────────────────────────────────────────────────────────
+
+export type ProjectType =
+  | "frontend"
+  | "backend"
+  | "fullstack"
+  | "library"
+  | "cli"
+  | "monorepo"
+  | "unknown";
+
+export interface DetectedFramework {
+  name: string;
+  version?: string;
+  category:
+    | "framework"
+    | "runtime"
+    | "orm"
+    | "testing"
+    | "bundler"
+    | "css"
+    | "ui-library"
+    | "api"
+    | "database"
+    | "auth"
+    | "other";
+}
+
+export interface TechStack {
+  language: string;
+  runtime: string;
+  frameworks: DetectedFramework[];
+  packageManager: string;
+  hasTypeScript: boolean;
+  tsTarget?: string;
+  tsModule?: string;
+}
+
+export interface BestPractice {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  applicableTo: string[];
+}
+
+export interface ProjectFlowStep {
+  name: string;
+  description: string;
+  technology: string;
+}
+
+export interface ProjectFlow {
+  layers: ProjectFlowStep[];
+  dataFlow: string[];
+  deploymentNotes: string[];
+}
+
+export interface ProjectAnalysis {
+  projectName: string;
+  projectType: ProjectType;
+  techStack: TechStack;
+  directoryPatterns: string[];
+  bestPractices: BestPractice[];
+  architectureFlow: ProjectFlow;
+  detectedAt: string;
+  source: "auto" | "manual";
+}
+
+export interface ManualProjectInput {
+  projectName: string;
+  projectType: ProjectType;
+  frameworks: string[];
+  language: string;
+  projectIdea: string;
 }

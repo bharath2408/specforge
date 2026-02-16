@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { Article, Amendment, Constitution } from "./types.js";
+import type { Article, Amendment, Constitution, ProjectAnalysis } from "./types.js";
+import { generateProjectContextMarkdown } from "./project-analyzer.js";
 
 /**
  * Get the 9 default articles of the SpecForge constitution.
@@ -75,16 +76,25 @@ export function parseConstitution(content: string): Constitution {
   let currentSection: "articles" | "amendments" | null = null;
   let currentArticle: Partial<Article> | null = null;
   let currentAmendment: Partial<Amendment> | null = null;
+  let skipSection = false;
 
   for (const line of lines) {
+    if (line.startsWith("## Project Context")) {
+      skipSection = true;
+      currentSection = null;
+      continue;
+    }
     if (line.startsWith("## Articles")) {
+      skipSection = false;
       currentSection = "articles";
       continue;
     }
     if (line.startsWith("## Amendments")) {
+      skipSection = false;
       currentSection = "amendments";
       continue;
     }
+    if (skipSection) continue;
 
     if (currentSection === "articles") {
       const articleMatch = line.match(
@@ -176,7 +186,8 @@ export function addAmendment(
  * Generate the full constitution markdown content.
  */
 export function generateConstitutionMarkdown(
-  constitution: Constitution
+  constitution: Constitution,
+  projectAnalysis?: ProjectAnalysis
 ): string {
   let md = "# Project Constitution\n\n";
   md +=
@@ -187,6 +198,10 @@ export function generateConstitutionMarkdown(
   for (const article of constitution.articles) {
     md += `### [${article.id}] ${article.title}\n\n`;
     md += `${article.description}\n\n`;
+  }
+
+  if (projectAnalysis) {
+    md += generateProjectContextMarkdown(projectAnalysis);
   }
 
   md += "## Amendments\n\n";
