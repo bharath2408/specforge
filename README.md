@@ -532,6 +532,20 @@ packages/
 
 All packages are published under the `@specforge-dev` scope on npm.
 
+### Version Management
+
+The version number is defined once in `packages/core/src/version.ts` and used everywhere at runtime. To bump the version:
+
+1. Edit the `VERSION` constant in `packages/core/src/version.ts`
+2. Run `pnpm version:sync` to update all 4 `package.json` files
+3. Rebuild with `pnpm build`
+
+```bash
+# After editing packages/core/src/version.ts
+pnpm version:sync   # syncs VERSION → all package.json files
+pnpm build          # rebuilds all packages
+```
+
 ## Environment Variables
 
 | Variable | Purpose |
